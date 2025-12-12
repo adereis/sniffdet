@@ -43,7 +43,7 @@ static u_char default_dest_fake_hw_addr[6] = {0xff, 0x00, 0x00, 0x00, 0x00, 0x00
 static u_char default_source_fake_hw_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 
 // avoid 'simultaneous' calls
-pthread_mutex_t callback_mutex;
+static pthread_mutex_t callback_mutex;
 
 // threads flow control
 static volatile unsigned int timed_out;

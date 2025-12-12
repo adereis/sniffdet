@@ -41,7 +41,7 @@ static u_char default_fake_hwaddr[6] = {0x44, 0x44, 0x44, 0x44, 0x11, 0xff};
 static char *default_fake_ipaddr = "10.0.0.21";
 
 // avoid 'simultaneous' calls
-pthread_mutex_t callback_mutex;
+static pthread_mutex_t callback_mutex;
 
 // threads flow control
 static volatile unsigned int timed_out;
