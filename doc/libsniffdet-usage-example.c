@@ -12,8 +12,6 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *  See file COPYING for details.
- *
- * $Id: libsniffdet-usage-example.c,v 1.1 2003/07/04 04:21:11 ademar Exp $
  */
 
 /* compile with:

@@ -13,8 +13,6 @@
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *  See file COPYING for details.
- *
- * $Id$
  */
 
 #ifndef SNIFFDET_PLUGINS_H

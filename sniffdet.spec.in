@@ -1,5 +1,3 @@
-# $Id$
-
 %define with_devel 1
 %define pluginsdir %{_libdir}/sniffdet/plugins/
 
@@ -24,10 +22,10 @@ composed by a flexible and easy to use library plus
 an application to run the tests.
 
 %description -l pt_BR
-Sniffdet é uma implementação aberta de um conjunto de testes
-para detecção remota de sniffers em redes TCP/IP. O Pacote é
-composto por uma biblioteca flexível e simples de usar além
-de uma aplicação para execução dos testes.
+Sniffdet ï¿½ uma implementaï¿½ï¿½o aberta de um conjunto de testes
+para detecï¿½ï¿½o remota de sniffers em redes TCP/IP. O Pacote ï¿½
+composto por uma biblioteca flexï¿½vel e simples de usar alï¿½m
+de uma aplicaï¿½ï¿½o para execuï¿½ï¿½o dos testes.
 
 %if %{with_devel}
 %package devel
@@ -44,12 +42,12 @@ Notice that the shared library API is not considered stable.
 The dynamic library should not be used before the 1.0 release.
 
 %description -l pt_BR devel
-Este pacote contém a biblioteca sniffdet, arquivos de inclusão e
-páginas man necesárias a desenvolvedores que desejam utilizar a API do
+Este pacote contï¿½m a biblioteca sniffdet, arquivos de inclusï¿½o e
+pï¿½ginas man necesï¿½rias a desenvolvedores que desejam utilizar a API do
 sniffdet.
 
-Note que a API da biblioteca só será considerada estável na versão 1.0,
-então é recomendado o uso apenas da biblioteca estática.
+Note que a API da biblioteca sï¿½ serï¿½ considerada estï¿½vel na versï¿½o 1.0,
+entï¿½o ï¿½ recomendado o uso apenas da biblioteca estï¿½tica.
 %endif
 
 %prep
