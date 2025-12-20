@@ -16,12 +16,12 @@
  * general use functions
  */
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#ifndef SNIFFDET_UTIL_H
+#define SNIFFDET_UTIL_H
 
 int drop_root(int uid, int gid);
 char **parse_targets_file(FILE *f_hosts);
 char **network_ips(char *netmask, char *network);
 int free_stringlist(char **list);
 
-#endif
+#endif // SNIFFDET_UTIL_H

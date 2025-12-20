@@ -17,8 +17,8 @@
  *  $Id$
  */
 
-#ifndef __LIBSNIFFDET_H__
-#define __LIBSNIFFDET_H__
+#ifndef LIBSNIFFDET_H
+#define LIBSNIFFDET_H
 
 #include <stdio.h>
 #include <time.h>
@@ -426,4 +426,4 @@ unsigned char *sndet_gen_tcp_pkt(struct custom_info *custom_pkt,
  */
 void sndet_sleep(long sec, long usec);
 
-#endif // __LIBSNIFFDET_H__
+#endif // LIBSNIFFDET_H

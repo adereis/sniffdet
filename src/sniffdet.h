@@ -17,8 +17,8 @@
  *  $Id$
  */
 
-#ifndef __SNIFFDET_H__
-#define __SNIFFDET_H__
+#ifndef SNIFFDET_H
+#define SNIFFDET_H
 
 #ifndef __LIBNET_H
 #include <libnet.h>
@@ -136,4 +136,4 @@ struct snd_tests {
 
 int read_config(char *filename);
 
-#endif // __SNIFFDET_H__
+#endif // SNIFFDET_H

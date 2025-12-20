@@ -17,8 +17,8 @@
  */
 
 
-#ifndef __LOG_H__
-#define __LOG_H__
+#ifndef SNIFFDET_LOG_H
+#define SNIFFDET_LOG_H
 
 /*
  * Multiple outputs can be used
@@ -33,4 +33,4 @@
 #define MAX_LOG_MSG_LEN 512
 int mylog(unsigned int ltype, int fd, const char *format, ...);
 
-#endif
+#endif // SNIFFDET_LOG_H

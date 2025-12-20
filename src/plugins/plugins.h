@@ -17,10 +17,10 @@
  * $Id$
  */
 
-#ifndef __PLUGINS_H__
-#define __PLUGINS_H__
+#ifndef SNIFFDET_PLUGINS_H
+#define SNIFFDET_PLUGINS_H
 
 int test_output(char *target, struct test_info info[],
 		struct config_options config, char *errbuf);
 
-#endif
+#endif // SNIFFDET_PLUGINS_H
