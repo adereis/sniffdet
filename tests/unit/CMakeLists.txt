@@ -43,3 +43,21 @@ set_tests_properties(test_config PROPERTIES
     TIMEOUT 30
     ENVIRONMENT "CMOCKA_MESSAGE_OUTPUT=STDOUT"
 )
+
+# Test for logging module
+add_executable(test_log test_log.c
+    ${CMAKE_SOURCE_DIR}/src/log.c
+)
+target_link_libraries(test_log
+    PRIVATE
+        cmocka::cmocka
+)
+target_include_directories(test_log
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+)
+add_test(NAME test_log COMMAND test_log)
+set_tests_properties(test_log PROPERTIES
+    TIMEOUT 30
+    ENVIRONMENT "CMOCKA_MESSAGE_OUTPUT=STDOUT"
+)
