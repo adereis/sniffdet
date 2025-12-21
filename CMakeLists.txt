@@ -54,16 +54,28 @@ else()
     set(DL_LIBRARY "")
 endif()
 
+# We need GNUInstallDirs for standard install paths
+include(GNUInstallDirs)
+
 # Configuration options (like the old --with-uid, --with-gid, etc.)
 set(SNDET_DEFAULT_UID 65534 CACHE STRING "Default UID for dropping privileges (default: nobody)")
 set(SNDET_DEFAULT_GID 65534 CACHE STRING "Default GID for dropping privileges (default: nogroup)")
-set(SNDET_PLUGINSDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sniffdet/plugins"
-    CACHE PATH "Directory for sniffdet plugins")
-set(SNDET_CONFIG "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SYSCONFDIR}/sniffdet.conf"
-    CACHE PATH "Default configuration file path")
 
-# We need GNUInstallDirs for the paths above
-include(GNUInstallDirs)
+# Path defaults: Debug builds use source/build directories for convenience,
+# Release builds use standard install paths.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # Development mode: run directly from build directory
+    set(SNDET_PLUGINSDIR "${CMAKE_BINARY_DIR}/src/plugins"
+        CACHE PATH "Directory for sniffdet plugins")
+    set(SNDET_CONFIG "${CMAKE_SOURCE_DIR}/sniffdet.conf-debug"
+        CACHE PATH "Default configuration file path")
+else()
+    # Install mode: standard FHS paths
+    set(SNDET_PLUGINSDIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/sniffdet/plugins"
+        CACHE PATH "Directory for sniffdet plugins")
+    set(SNDET_CONFIG "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SYSCONFDIR}/sniffdet.conf"
+        CACHE PATH "Default configuration file path")
+endif()
 
 # Generate config.h from template
 configure_file(

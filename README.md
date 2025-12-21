@@ -63,6 +63,26 @@ cmake --build build
 | `SNIFFDET_ENABLE_SANITIZERS` | OFF | Enable AddressSanitizer and UBSan |
 | `CMAKE_BUILD_TYPE` | Release | Build type (Debug, Release, RelWithDebInfo) |
 
+### Development Builds
+
+Debug builds automatically use paths within the source/build tree:
+
+```bash
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build .
+./src/sniffdet --help   # Uses sniffdet.conf-debug and build/src/plugins/
+```
+
+No need to specify `-c` or `-p` flags during development.
+
+### Configuration File Search Path
+
+sniffdet follows the XDG Base Directory specification for config files:
+
+1. `$XDG_CONFIG_HOME/sniffdet/sniffdet.conf` (usually `~/.config/sniffdet/`)
+2. `/etc/sniffdet/sniffdet.conf`
+3. Compiled default (varies by build type)
+
 Example with sanitizers enabled:
 
 ```bash

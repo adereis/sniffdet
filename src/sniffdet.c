@@ -29,6 +29,82 @@
 #include "log.h"
 #include "util.h"
 
+/*
+ * XDG Base Directory support
+ *
+ * Modern Unix applications follow the XDG Base Directory Specification
+ * for locating config files. This provides a search hierarchy:
+ *   1. $XDG_CONFIG_HOME/sniffdet/ (usually ~/.config/sniffdet/)
+ *   2. /etc/sniffdet/
+ *   3. Compiled default (varies by build type)
+ *
+ * See: https://specifications.freedesktop.org/basedir-spec/latest/
+ */
+
+/* Find the config file using XDG search path */
+static const char *find_config_file(void)
+{
+	static char path[PATH_MAX];
+	const char *xdg_config;
+	const char *home;
+
+	/* Try XDG_CONFIG_HOME first (usually ~/.config) */
+	xdg_config = getenv("XDG_CONFIG_HOME");
+	if (xdg_config && xdg_config[0] != '\0') {
+		snprintf(path, PATH_MAX, "%s/sniffdet/sniffdet.conf", xdg_config);
+		if (access(path, R_OK) == 0)
+			return path;
+	} else {
+		/* Fall back to ~/.config if XDG_CONFIG_HOME not set */
+		home = getenv("HOME");
+		if (home && home[0] != '\0') {
+			snprintf(path, PATH_MAX, "%s/.config/sniffdet/sniffdet.conf", home);
+			if (access(path, R_OK) == 0)
+				return path;
+		}
+	}
+
+	/* Try system config directory */
+	if (access("/etc/sniffdet/sniffdet.conf", R_OK) == 0)
+		return "/etc/sniffdet/sniffdet.conf";
+
+	/* Fall back to compiled default */
+	return SNDET_CONFIG;
+}
+
+/* Find the plugins directory using XDG search path */
+static const char *find_plugins_dir(void)
+{
+	static char path[PATH_MAX];
+	const char *xdg_data;
+	const char *home;
+
+	/* Try XDG_DATA_HOME first (usually ~/.local/share) */
+	xdg_data = getenv("XDG_DATA_HOME");
+	if (xdg_data && xdg_data[0] != '\0') {
+		snprintf(path, PATH_MAX, "%s/sniffdet/plugins", xdg_data);
+		if (access(path, X_OK) == 0)
+			return path;
+	} else {
+		/* Fall back to ~/.local/share if XDG_DATA_HOME not set */
+		home = getenv("HOME");
+		if (home && home[0] != '\0') {
+			snprintf(path, PATH_MAX, "%s/.local/share/sniffdet/plugins", home);
+			if (access(path, X_OK) == 0)
+				return path;
+		}
+	}
+
+	/* Try system lib directory */
+	if (access("/usr/lib/sniffdet/plugins", X_OK) == 0)
+		return "/usr/lib/sniffdet/plugins";
+	if (access("/usr/local/lib/sniffdet/plugins", X_OK) == 0)
+		return "/usr/local/lib/sniffdet/plugins";
+
+	/* Fall back to compiled default */
+	return SNDET_PLUGINSDIR;
+}
+
 // function prototypes
 static int tests_msg_callback(struct test_status *status,
 		const int msg_type, char *msg);
@@ -427,20 +503,26 @@ int main(int argc, char **argv)
 static void set_global_defaults(void)
 {
 	snprintf(config.global.iface, MAX_CFG_VAR_SIZE, "%s", "eth0");
-	config.global.UID = SNDET_DEFAULT_UID; // just a non meaning number
-	config.global.GID = SNDET_DEFAULT_GID; // just a non meaning number
+	config.global.UID = SNDET_DEFAULT_UID;
+	config.global.GID = SNDET_DEFAULT_GID;
 	config.global.verbose = 0;
 	config.global.silent = 0;
 	config.global.logtype = LOG_NOLOG;
 	config.global.logfilename[0] = '\0';
-	snprintf(config.global.plugins_dir, MAX_CFG_VAR_SIZE, "%s", SNDET_PLUGINSDIR);
+
+	/* Use XDG search path for plugins directory */
+	snprintf(config.global.plugins_dir, MAX_CFG_VAR_SIZE, "%s", find_plugins_dir());
 	snprintf(config.global.plugin, MAX_CFG_VAR_SIZE, "%s", "stdout.so");
 
 	snprintf(config.plugins.xml.filename, MAX_CFG_VAR_SIZE, "%s", "tests_result.xml");
 
 	args.target = NULL;
 	args.targetsfile = NULL;
-	args.configfile = SNDET_CONFIG;
+	/* Use XDG search path for config file.
+	 * Cast needed because struct arguments uses char* instead of const char*
+	 * (a pre-existing const-correctness issue).
+	 */
+	args.configfile = (char *)find_config_file();
 
 	// no tests by default
 	run_tests.dnstest = 0;
@@ -450,8 +532,6 @@ static void set_global_defaults(void)
 
 	// no log by default
 	logfd = -1;
-
-	return;
 }
 
 
