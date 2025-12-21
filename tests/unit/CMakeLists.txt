@@ -21,3 +21,25 @@ set_tests_properties(test_util PROPERTIES
     TIMEOUT 30
     ENVIRONMENT "CMOCKA_MESSAGE_OUTPUT=STDOUT"
 )
+
+# Test for config file parser
+# Needs config_file.c and its dependencies (libnet for TCP flags, etc.)
+add_executable(test_config test_config.c
+    ${CMAKE_SOURCE_DIR}/src/config_file.c
+)
+target_link_libraries(test_config
+    PRIVATE
+        cmocka::cmocka
+        sniffdet_lib
+        libnet
+)
+target_include_directories(test_config
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/src/lib
+)
+add_test(NAME test_config COMMAND test_config)
+set_tests_properties(test_config PROPERTIES
+    TIMEOUT 30
+    ENVIRONMENT "CMOCKA_MESSAGE_OUTPUT=STDOUT"
+)
