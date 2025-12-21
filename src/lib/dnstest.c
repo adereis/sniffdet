@@ -610,7 +610,7 @@ static int dns_query_search4host(int pkt_offset, const u_char *pkt,
 	const struct libnet_udp_hdr *udp;
 	const struct libnet_dns_hdr *dns;
 	const char *data;
-	char names[512];
+	char names[512] = "";
 	char *inverted_host;
 	char buffer[MAX_HOSTNAME_LEN];
 	int left_bytes = pkt_len;
@@ -645,7 +645,10 @@ static int dns_query_search4host(int pkt_offset, const u_char *pkt,
 		strncat(names, ".", sizeof(names) - strlen(names));
 	}
 
-	names[strlen(names) - 1] = 0x0;
+	// Remove trailing dot added by the loop above
+	size_t names_len = strlen(names);
+	if (names_len > 0)
+		names[names_len - 1] = '\0';
 
 	inverted_host = string_inversion(host_dotdecimal);
 	snprintf(buffer, MAX_HOSTNAME_LEN, "%s.in-addr.arpa", inverted_host);
