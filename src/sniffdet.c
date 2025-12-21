@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 					"Dropping root privileges UID: %d, GID: %d",
 					config.global.UID, config.global.GID);
 		}
-		if (!drop_root(config.global.UID, config.global.GID)) {
+		if (drop_root(config.global.UID, config.global.GID)) {
 			mylog(config.global.logtype | LOG_USE_STDERR, logfd,
 					"Error dropping privileges");
 			mylog(config.global.logtype | LOG_USE_STDERR, logfd,

@@ -24,15 +24,18 @@
 
 /* drop root privileges, if they found a way to exploit us, we don't
  * want the exploit to run as root.
+ *
+ * IMPORTANT: setgid() must be called before setuid(). Once UID is dropped,
+ * we no longer have permission to change GID.
  */
 int drop_root(int uid, int gid)
 {
-	if (setuid(uid)) {
-		return 2;
-	}
-
 	if (setgid(gid)) {
 		return 1;
+	}
+
+	if (setuid(uid)) {
+		return 2;
 	}
 
 	return 0;
