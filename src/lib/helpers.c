@@ -106,6 +106,11 @@ struct ether_addr * sndet_get_iface_mac_addr(struct sndet_device *sndet_dev, cha
 
 	if (tmp_mac) {
 		mac = (struct ether_addr *) malloc(sizeof(struct ether_addr));
+		if (mac == NULL) {
+			snprintf(errbuf, LIBSNIFFDET_ERR_BUF_LEN,
+				"Memory allocation failed for MAC address");
+			return NULL;
+		}
 		memcpy(mac, tmp_mac, sizeof(struct ether_addr));
 	} else {
 		snprintf(errbuf, LIBSNIFFDET_ERR_BUF_LEN,

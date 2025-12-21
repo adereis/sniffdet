@@ -287,6 +287,9 @@ static struct custom_info *build_default_pkt(struct sndet_device *device)
 	u_char fake_hw_addr[6] = {0xff, 0x00, 0x33, 0x67, 0x12, 0x45};
 
 	bogus_pkt = malloc(sizeof(struct custom_info));
+	if (bogus_pkt == NULL) {
+		return NULL;
+	}
 
 	bogus_pkt->values_set = CUSTOM_DMAC | CUSTOM_SMAC | CUSTOM_ID |
 		CUSTOM_TTL | CUSTOM_SRC_IP | CUSTOM_DEST_IP | CUSTOM_SEQ |
@@ -311,6 +314,10 @@ static struct custom_info *build_default_pkt(struct sndet_device *device)
 	bogus_pkt->dport = 23; // telnet
 	bogus_pkt->sport = 23; // telnet
 	bogus_pkt->payload = malloc(8);
+	if (bogus_pkt->payload == NULL) {
+		free(bogus_pkt);
+		return NULL;
+	}
 	bogus_pkt->payload_len = 8;
 
 	return bogus_pkt;

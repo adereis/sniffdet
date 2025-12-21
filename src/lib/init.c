@@ -50,6 +50,11 @@ struct sndet_device * sndet_init_device(char *device, int promisc, char *errbuf)
 	char ext_errbuf[LIBNET_ERRBUF_SIZE | PCAP_ERRBUF_SIZE];
 
 	sndet_dev = malloc(sizeof(struct sndet_device));
+	if (sndet_dev == NULL) {
+		snprintf(errbuf, LIBSNIFFDET_ERR_BUF_LEN,
+				"Memory allocation failed for device structure");
+		return NULL;
+	}
 
 	// find the device to open
 	// use a default (from libpcap) if the user didn't supply one
