@@ -39,11 +39,28 @@ sniffdet/
 ├── src/
 │   ├── lib/          # libsniffdet - the detection library
 │   └── *.c           # sniffdet CLI tool
+├── tests/
+│   └── unit/         # CMocka unit tests
 ├── third_party/
 │   └── libnet/       # Vendored libnet 1.0.2a
 ├── cmake/            # CMake modules (if needed)
 └── doc/              # Documentation
 ```
+
+### Testing
+
+Uses CMocka framework with CTest integration:
+```bash
+cd build && ctest --output-on-failure
+```
+
+Test files:
+- `tests/unit/test_helpers.c` - tests for libsniffdet helper functions
+- `tests/unit/test_util.c` - tests for CLI utility functions
+
+### Modernization Roadmap
+See [`doc/MODERNIZATION.md`](doc/MODERNIZATION.md) for the detailed analysis of
+architectural improvements and refactoring tasks.
 
 ## Commit Message Guidelines
 

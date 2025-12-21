@@ -58,6 +58,7 @@ cmake --build build
 | Option | Default | Description |
 |--------|---------|-------------|
 | `SNIFFDET_BUILD_CLI` | ON | Build the sniffdet command-line tool |
+| `SNIFFDET_BUILD_TESTS` | ON | Build the test suite |
 | `SNIFFDET_ENABLE_SANITIZERS` | OFF | Enable AddressSanitizer and UBSan |
 | `CMAKE_BUILD_TYPE` | Release | Build type (Debug, Release, RelWithDebInfo) |
 
@@ -71,6 +72,29 @@ cmake -DSNIFFDET_ENABLE_SANITIZERS=ON -DCMAKE_BUILD_TYPE=Debug ..
 
 The build generates `compile_commands.json` for clangd and other tools.
 For VS Code, install the clangd extension and it will work automatically.
+
+### Testing
+
+The project uses CMocka for unit testing. Tests are built by default.
+
+```bash
+# Run all tests
+cd build
+ctest --output-on-failure
+
+# Or run test binaries directly
+./tests/unit/test_helpers
+./tests/unit/test_util
+```
+
+To skip building tests:
+```bash
+cmake -DSNIFFDET_BUILD_TESTS=OFF ..
+```
+
+**Note**: CMocka is auto-detected. Install via package manager (`libcmocka-devel`
+on Fedora, `libcmocka-dev` on Debian) for faster builds, or let CMake download
+it automatically via FetchContent.
 
 ## Usage
 

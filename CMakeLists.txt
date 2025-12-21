@@ -23,6 +23,7 @@ endif()
 
 # Build options
 option(SNIFFDET_BUILD_CLI "Build the sniffdet command-line tool" ON)
+option(SNIFFDET_BUILD_TESTS "Build the test suite" ON)
 option(SNIFFDET_ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 
 # Compiler warnings - strict but tolerant of legacy patterns
@@ -85,6 +86,12 @@ if(SNIFFDET_BUILD_CLI)
     add_subdirectory(src)
 endif()
 
+# Build tests
+if(SNIFFDET_BUILD_TESTS)
+    enable_testing()  # Must be in root CMakeLists.txt for CTest to find tests
+    add_subdirectory(tests)
+endif()
+
 # Configuration summary (like the old configure script output)
 message(STATUS "")
 message(STATUS "sniffdet ${PROJECT_VERSION} configuration:")
@@ -93,4 +100,5 @@ message(STATUS "  C compiler:      ${CMAKE_C_COMPILER}")
 message(STATUS "  C standard:      C${CMAKE_C_STANDARD}")
 message(STATUS "  Sanitizers:      ${SNIFFDET_ENABLE_SANITIZERS}")
 message(STATUS "  Build CLI:       ${SNIFFDET_BUILD_CLI}")
+message(STATUS "  Build tests:     ${SNIFFDET_BUILD_TESTS}")
 message(STATUS "")
