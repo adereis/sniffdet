@@ -1,10 +1,10 @@
-prefix=@CMAKE_INSTALL_PREFIX@
+prefix=@PKG_PREFIX@
 exec_prefix=${prefix}
-libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
-includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+libdir=@PKG_LIBDIR@
+includedir=@PKG_INCLUDEDIR@
 
 Name: libsniffdet
-Description: @PROJECT_DESCRIPTION@
-Version: @PROJECT_VERSION@
+Description: @PKG_DESCRIPTION@
+Version: @PKG_VERSION@
 Libs: -L${libdir} -lsniffdet -lpthread -lpcap
 Cflags: -I${includedir}

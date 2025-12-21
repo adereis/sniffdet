@@ -56,3 +56,14 @@ add_subdirectory(unit)
 
 # Add integration tests subdirectory (requires root)
 add_subdirectory(integration)
+
+# Build system tests (install prefix, pkg-config, etc.)
+add_test(
+    NAME install_prefix
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/test_install.cmake
+)
+set_tests_properties(install_prefix PROPERTIES
+    LABELS "build_system"
+    TIMEOUT 60
+    ENVIRONMENT "BUILD_DIR=${CMAKE_BINARY_DIR};SOURCE_DIR=${CMAKE_SOURCE_DIR}"
+)

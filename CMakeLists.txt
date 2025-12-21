@@ -92,12 +92,8 @@ configure_file(
     @ONLY
 )
 
-# Generate pkg-config file
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/libsniffdet.pc.in
-    ${CMAKE_CURRENT_BINARY_DIR}/libsniffdet.pc
-    @ONLY
-)
+# pkg-config file is generated at install time (see install rules below)
+# to correctly handle --prefix overrides
 
 # Generate default config file (for installation)
 configure_file(
@@ -127,8 +123,20 @@ if(SNIFFDET_BUILD_TESTS)
 endif()
 
 # Installation rules
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libsniffdet.pc
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+# Generate pkg-config file at install time so it respects --prefix overrides
+install(CODE "
+    set(PKG_PREFIX \"\${CMAKE_INSTALL_PREFIX}\")
+    set(PKG_LIBDIR \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}\")
+    set(PKG_INCLUDEDIR \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}\")
+    set(PKG_DESCRIPTION \"${PROJECT_DESCRIPTION}\")
+    set(PKG_VERSION \"${PROJECT_VERSION}\")
+    configure_file(
+        \"${CMAKE_CURRENT_SOURCE_DIR}/libsniffdet.pc.in\"
+        \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig/libsniffdet.pc\"
+        @ONLY
+    )
+")
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sniffdet.conf
     DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
