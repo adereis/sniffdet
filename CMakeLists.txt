@@ -92,6 +92,20 @@ configure_file(
     @ONLY
 )
 
+# Generate pkg-config file
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/libsniffdet.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/libsniffdet.pc
+    @ONLY
+)
+
+# Generate default config file (for installation)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/sniffdet.conf.in
+    ${CMAKE_CURRENT_BINARY_DIR}/sniffdet.conf
+    @ONLY
+)
+
 # Make generated config.h available to all targets
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -111,6 +125,22 @@ if(SNIFFDET_BUILD_TESTS)
     enable_testing()  # Must be in root CMakeLists.txt for CTest to find tests
     add_subdirectory(tests)
 endif()
+
+# Installation rules
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libsniffdet.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sniffdet.conf
+    DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}
+    RENAME sniffdet.conf)
+
+# Man pages
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/sniffdet.1
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/libsniffdet.3
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man3)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/sniffdet.conf.5
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
 
 # Configuration summary (like the old configure script output)
 message(STATUS "")
