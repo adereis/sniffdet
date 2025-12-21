@@ -1,424 +1,179 @@
-.\" libsniffdet - A library for network sniffers detection
-.\" Copyright (c) 2002
-.\"   Ademar de Souza Reis Jr. <ademar@ademar.org>
-.\"   Milton Soares Filho <eu_mil@yahoo.com>
-.\"
-.\" This is free documentation; you can redistribute it and/or
-.\" modify it under the terms of the GNU General Public License as
-.\" published by the Free Software Foundation; either version 2 of
-.\" the License, or (at your option) any later version.
-.\"
-.\" The GNU General Public License's references to "object code"
-.\" and "executables" are to be interpreted as the output of any
-.\" document formatting or typesetting system, including
-.\" intermediate and printed output.
-.\"
-.\" This manual is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-.\" GNU General Public License for more details.
-.\"
-.\" You should have received a copy of the GNU General Public
-.\" License along with this manual; if not, write to the Free
-.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
-.\" USA.
-.\"
-.TH LIBSNIFFDET 3 2002-11-28 "sniffdet manpage" "Remote Sniffer Detection Library"
+.\" SPDX-License-Identifier: GPL-2.0-or-later
+.TH LIBSNIFFDET 3 2025-12-21 "libsniffdet 0.10" "Library Functions"
 .SH NAME
-libsniffdet - Sniffer detection library
-.SH DESCRIPTION
-This library is useful for remote sniffer detection or to
-discover machines which are running in promiscuous mode.
-You can see the full documentation at http://sniffdet.sourceforge.net
+libsniffdet \- sniffer detection library
 .SH SYNOPSIS
-.B #include <sniffdet.h>
-
-.B GENERAL DEFINITIONS
-
-\fBCallback\fR
+.nf
+.B #include <libsniffdet.h>
+.fi
 .PP
-The callback functions used by the detection tests for activity report and
-interactivity issues must have the following prototype, providing that its
-return value is used to cancel the current execution of the detection test.
+.BI "struct sndet_device *sndet_init_device(char *" device ", int " promisc ", char *" errbuf );
+.br
+.BI "int sndet_finish_device(struct sndet_device *" device ", char *" errbuf );
 .PP
-.B int (*user_callback)(struct test_status *status, int msg_type, char *msg);
-
-The first argument is a structure of the type below, containing information
-about the state of execution (in percent) and the quantity of
-incoming and outcoming packets of the current test.
-
-struct test_status {
+.BI "int sndet_icmptest(char *" host ", struct sndet_device *" device ", ...);"
 .br
-	unsigned short int percent; // 0% to 100%
+.BI "int sndet_arptest(char *" host ", struct sndet_device *" device ", ...);"
 .br
-	unsigned int bytes_sent;
+.BI "int sndet_dnstest(char *" host ", struct sndet_device *" device ", ...);"
 .br
-	unsigned int bytes_recvd;
-.br
-};
-.br
-
-The second argument is one of the following enumerations.
-
-RUNNING	- used just for resposivity purposes
-.br
-NOTIFICATION - general messages
-.br
-ERROR - critical conditions (abort cases)
-.br
-WARNING - critical conditions (do not abort the execution)
-.br
-DETECTION - detection performed
-.br
-ENDING - indicates the end of the detction test
-.br
-
-\fBDevice\fR
+.BI "int sndet_latencytest_pktflood(char *" host ", struct sndet_device *" device ", ...);"
+.SH DESCRIPTION
+.B libsniffdet
+is a library for detecting machines running in promiscuous mode
+on a network.
+It provides several detection tests based on academic research
+into remote sniffer detection techniques.
+.SH DEVICE INITIALIZATION
+Before running any tests, initialize the network device:
 .PP
-The following functions should be used to initialize/finish the network
-device.
+.BI "struct sndet_device *sndet_init_device(char *" device ", int " promisc ", char *" errbuf );
 .PP
-\fB
-struct sndet_device * sndet_init_device(
-.br
-	char *device,
-.br
-	int promisc,
-.br
-	char *errbuf);
-\fR
-
-\fB
-int sndet_finish_device(
-.br
-	struct sndet_device *device,
-.br
-	char *errbuf);
-\fR
-
-Where struct sndet_device has the following layout.
-
-struct sndet_device {
-.br
-	char *device;
-.br
-	int datalink;
-.br
-	int pkt_offset;
-.br
-	struct libnet_link_int *ln_int;
-.br
-	pcap_t *pktdesc;
-.br
-	bpf_u_int32 network;
-.br
-	bpf_u_int32 netmask;
-.br
-	int rawsock;
-.br
-};
-.br
-
-// datalink type// device name// sync bytes	// raw socket id
-
-.B Results
-
-All the detection tests return their results in the following structure.
-
-struct test_info {
-.br
-	enum test_code code;
-.br
-	int valid;
-.br
-	char *test_name;
-.br
-	char *test_short_desc;
-.br
-	time_t time_start;	
-.br
-	time_t time_fini;
-.br
-	unsigned int b_sent;
-.br
-	unsigned int b_recvd;
-.br
-	unsigned int pkts_sent;
-.br
-	unsigned int pkts_recvd;
-.br
-	union {
-.br
-		struct icmptest_result icmp;
-.br
-		struct arptest_result arp;
-.br
-		struct dnstest_result dns;
-.br
-		struct latencytest_result latency;
-.br
-	} test;
-.br
-};
-.br
-
-// detection test enumeration - see libsniffdet.h
-// wether it was valid or not
-// name of the test
-// test short description
-// start time // stop time
-// bytes sent // bytes received
-// packets sent // packets received
-// specifics results
-
-\fBGeneral Use Functions\fR
-.br
-There are many functions built to provide basic network and general purpose
-functions.
-
-.B u_long sndet_resolve(char *hostname);
-
-Resolve hostname, returns binary representation in network-ordered
-representation. Hostname is an ASCII string representing an IPv4 address
-(canonical hostname or doted decimal representation).
-
-.B int sndet_random(void);
-
-Returns a pseudo random integer
-
-.B int sndet_ping_host(
-.br
-.B		char *host,
-.br
-.B		struct sndet_device *device,
-.br
-.B		long tmout,
-.br
-.B		long send_interval,
-.br
-.B		unsigned int burst_size,
-.br
-.B		struct sndet_ping_result *result,
-.br
-.B		char *errmsg);
-
-Common ping function. Provided are the target name (\fBhost\fR), a pointer
-to the interface structure (\fBdevice\fR), the \fBtimeout\fR in seconds, the
-interval between target probes (\fBsend_interval\fR)and the amount of packets
-sent on each probe (\fBburst_size\fR). The last two args are used to return
-the results and to write the error message in case an internal error occurs.
-It returns non-zero if any error occurs.
-
-.B u_long sndet_get_iface_ip_addr(
-.br
-.B		struct sndet_device *sndet_dev,
-.br
-.B		char *errbuf);
-
-Returns interface IP address in binary notation (host-ordered) for the given
-interface structure (\fBsndet\fR). If any error occurs, an error message
-will be writen in \fBerrbuf\fR.
-
-.B struct ether_addr * sndet_get_iface_mac_addr(
-.br
-.B		struct sndet_device *sndet_dev,
-.br
-.B		char *errbuf);
-
-Returns interface MAC address
-
-.B unsigned char *sndet_gen_tcp_pkt(
-.br
-.B		struct custom_info *custom_pkt,
-.br
-.B		u_char ctrl_flags,
-.br
-.B		int *pkt_len,
-.br
-.B		char *errbuf);
-
-Generates a TCP packet based on information supplied in custom_pkt
-information
-
-.B void sndet_sleep(long sec, long usec);
-
-Independent and portable way for sleeping
-
-.SH DETECTION TESTS
-
-The folowing are the detection test implemented by the library. They always
-have as obrigatory arguments the name of the target host and the device
-structure. The rest of theirs parameters will be replaced for internal
-values if not specified (passing NULL or zero, depending of the data type).
-As a general rule, all the tests return non-zero if an error occurs. For
-more specific information about the error, one should verify the message
-returned by the callback functions.
-
-.B ICMP TEST
-\fB
-.br
-int sndet_icmptest(
-.br
-	char *host,
-.br
-	struct sndet_device *device,
-.br
-	unsigned int tmout,
-.br
-	unsigned int tries,
-.br
-	unsigned int send_interval,
-.br
-	user_callback callback,
-.br
-	struct test_info *result,
-.br
-	char *fakehwaddr
-.br
-);
-\fR
-
-// suspicious host
-// timeout in seconds
-// max number of tries
-// interval between packets sent (in msec)
-// fake MAC hardware address sent to the host
-
-.B ARP TEST
-\fB
-.br
-int sndet_arptest(
-.br
-	char *host,
-.br
-	struct sndet_device *device,
-.br
-	unsigned int tmout,
-.br
-	unsigned int tries,
-.br
-	unsigned int send_interval,
-.br
-	user_callback callback,
-.br
-	struct test_info *result,
-.br
-	char *fakehwaddr
-.br
-);
-\fR
-
-// suspicious host
-// timeout in seconds
-// max number of tries
-// interval between packets sent (in msec)
-// fake MAC hardware address sent to the host
-
-.B DNS TEST
-\fB
-.br
-int sndet_dnstest(
-.br
-	char *host,
-.br
-	struct sndet_device *device,
-.br
-	unsigned int tmout,
-.br
-	unsigned int tries,
-.br
-	unsigned int send_interval,
-.br
-	user_callback callback,
-.br
-	struct test_info *info,
-.br
-	// bogus pkt information, optional
-.br
-	char *fake_ipaddr,
-.br
-	char *fake_hwaddr,
-.br
-	ushort dport, ushort sport,
-.br
-	char *payload,
-.br
-	short int payload_len
-.br
-);
-\fR
-
-// pkt source
-// pkt destination
-// destination/source port
-// payload data
-// payload length
-
-.B LATENCY TEST
-\fB
-.br
-int sndet_latencytest_pktflood(
-.br
-	char *host,
-.br
-	struct sndet_device *device,
-.br
-	unsigned int tmout,
-.br
-	unsigned int probe_interval,
-.br
-	user_callback callback,
-.br
-	struct test_info *info,
-.br
-	struct custom_info *bogus_pkt
-.br
-);
-\fR
-
-// suspicious host
-// timeout in seconds
-// interval between probes (x10 msec)
-// info about the fake packet desired
-
-As the result, there's the structure below (time measured as tenths of
-second and RTT = Round Trip Time).
-
-\fB
-.br
-struct latencytest_result {
-.br
-	// time is expressed in msec/10
-.br
-	u_int normal_time;
-.br
-	u_int min_time;
-.br
-	u_int max_time;
-.br
-	u_int mean_time;
-.br
-};
-\fR
-
-.SH EXAMPLES
-See the documentation included with the library and the source distribution,
-which you can find at http://sniffdet.sourceforge.net. Take a look into the
-libsniffdet-usage-example.c file.
-.br
-.SH BUGS
-This library can be considered in beta stage since it was not widely tested.
-Your support is appreciated. :-)
-.br
-.PP
-Please report bugs at http://sniffdet.sourceforge.net or to
-sniffdet-devel@lists.sourceforge.net
-.PP
-See also our TODO file.
+.RS
 .TP
-.SH SEE ALSO
-.BR sniffdet (1)
-.BR libnet (3)
-.BR pcap (3)
+.I device
+Network interface name (e.g., "eth0", "enp0s3").
+.TP
+.I promisc
+Set to 1 to enable promiscuous mode on the interface.
+.TP
+.I errbuf
+Buffer for error messages (should be at least 256 bytes).
+.RE
 .PP
-.BR http://sniffdet.sourceforge.net
+Returns a pointer to an
+.B sndet_device
+structure on success, or NULL on error.
+.PP
+When finished, release resources with:
+.PP
+.BI "int sndet_finish_device(struct sndet_device *" device ", char *" errbuf );
+.SH CALLBACK FUNCTIONS
+All detection tests accept a callback function for progress reporting:
+.PP
+.BI "int (*user_callback)(struct test_status *" status ", int " msg_type ", char *" msg );
+.PP
+The callback receives:
+.TP
+.I status
+Current test progress (percent complete, bytes sent/received).
+.TP
+.I msg_type
+One of: RUNNING, NOTIFICATION, ERROR, WARNING, DETECTION, ENDING.
+.TP
+.I msg
+Human-readable message.
+.PP
+Return non-zero from the callback to cancel the test.
+.SH DETECTION TESTS
+All tests return 0 on success or non-zero on error.
+Results are stored in a
+.B struct test_info
+passed to each function.
+.SS ICMP Test
+.BI "int sndet_icmptest(char *" host ", struct sndet_device *" device ","
+.BI "unsigned int " tmout ", unsigned int " tries ", unsigned int " send_interval ","
+.BI "user_callback " callback ", struct test_info *" result ", char *" fakehwaddr );
+.PP
+Sends ICMP echo requests with a fake hardware address.
+Hosts in promiscuous mode may respond even though the MAC doesn't match.
+.SS ARP Test
+.BI "int sndet_arptest(char *" host ", struct sndet_device *" device ","
+.BI "unsigned int " tmout ", unsigned int " tries ", unsigned int " send_interval ","
+.BI "user_callback " callback ", struct test_info *" result ", char *" fakehwaddr );
+.PP
+Sends ARP requests with a fake hardware address.
+Promiscuous hosts may process and respond to these requests.
+.SS DNS Test
+.BI "int sndet_dnstest(char *" host ", struct sndet_device *" device ","
+.BI "unsigned int " tmout ", unsigned int " tries ", unsigned int " send_interval ","
+.BI "user_callback " callback ", struct test_info *" info ","
+.BI "char *" fake_ipaddr ", char *" fake_hwaddr ","
+.BI "ushort " dport ", ushort " sport ", char *" payload ", short int " payload_len );
+.PP
+Generates bogus TCP traffic to trigger reverse DNS lookups
+from sniffing hosts attempting to resolve source addresses.
+.SS Latency Test
+.BI "int sndet_latencytest_pktflood(char *" host ", struct sndet_device *" device ","
+.BI "unsigned int " tmout ", unsigned int " probe_interval ","
+.BI "user_callback " callback ", struct test_info *" info ","
+.BI "struct custom_info *" bogus_pkt );
+.PP
+Measures response time changes when flooding the network.
+Hosts processing all packets (promiscuous mode) show increased latency.
+.SH UTILITY FUNCTIONS
+.TP
+.BI "u_long sndet_resolve(char *" hostname );
+Resolve hostname to network-order IP address.
+.TP
+.BI "int sndet_random(void);"
+Return a cryptographically random integer.
+.TP
+.BI "u_long sndet_get_iface_ip_addr(struct sndet_device *" dev ", char *" errbuf );
+Return interface IP address in host byte order.
+.TP
+.BI "struct ether_addr *sndet_get_iface_mac_addr(struct sndet_device *" dev ", char *" errbuf );
+Return interface MAC address.
+.TP
+.BI "void sndet_sleep(long " sec ", long " usec );
+Portable sleep function.
+.SH DATA STRUCTURES
+.SS sndet_device
+.nf
+struct sndet_device {
+    char *device;           /* interface name */
+    int datalink;           /* datalink type */
+    int pkt_offset;         /* sync bytes */
+    struct libnet_link_int *ln_int;
+    pcap_t *pktdesc;
+    bpf_u_int32 network;
+    bpf_u_int32 netmask;
+    int rawsock;            /* raw socket id */
+};
+.fi
+.SS test_status
+.nf
+struct test_status {
+    unsigned short int percent;  /* 0% to 100% */
+    unsigned int bytes_sent;
+    unsigned int bytes_recvd;
+};
+.fi
+.SS test_info
+.nf
+struct test_info {
+    enum test_code code;         /* test type */
+    int valid;                   /* whether result is valid */
+    char *test_name;
+    char *test_short_desc;
+    time_t time_start;
+    time_t time_fini;
+    unsigned int b_sent;
+    unsigned int b_recvd;
+    unsigned int pkts_sent;
+    unsigned int pkts_recvd;
+    union {
+        struct icmptest_result icmp;
+        struct arptest_result arp;
+        struct dnstest_result dns;
+        struct latencytest_result latency;
+    } test;
+};
+.fi
+.SH EXAMPLE
+See the
+.I libsniffdet-usage-example.c
+file included in the source distribution.
+.SH BUGS
+Report bugs at https://github.com/adereis/sniffdet/issues
+.SH AUTHORS
+Ademar de Souza Reis Jr.
+.RI < ademar@ademar.org >
+.br
+Milton Soares Filho
+.RI < eu_mil@yahoo.com >
+.SH SEE ALSO
+.BR sniffdet (1),
+.BR sniffdet.conf (5),
+.BR pcap (3),
+.BR libnet (3)

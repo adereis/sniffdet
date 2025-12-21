@@ -1,140 +1,158 @@
-.\" libsniffdet - A library for network sniffers detection
-.\" Copyright (c) 2002
-.\"   Ademar de Souza Reis Jr. <ademar@ademar.org>
-.\"   Milton Soares Filho <eu_mil@yahoo.com>
-.\"
-.\" This is free documentation; you can redistribute it and/or
-.\" modify it under the terms of the GNU General Public License as
-.\" published by the Free Software Foundation; either version 2 of
-.\" the License, or (at your option) any later version.
-.\"
-.\" The GNU General Public License's references to "object code"
-.\" and "executables" are to be interpreted as the output of any
-.\" document formatting or typesetting system, including
-.\" intermediate and printed output.
-.\"
-.\" This manual is distributed in the hope that it will be useful,
-.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
-.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-.\" GNU General Public License for more details.
-.\"
-.\" You should have received a copy of the GNU General Public
-.\" License along with this manual; if not, write to the Free
-.\" Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111,
-.\" USA.
-.\"
-.TH SNIFFDET 1 2002-11-25 "sniffdet manpage" "Remote Sniffer Detection Tool"
+.\" SPDX-License-Identifier: GPL-2.0-or-later
+.TH SNIFFDET 1 2025-12-21 "sniffdet 0.10" "User Commands"
 .SH NAME
-sniffdet - Remote sniffer detection tool
+sniffdet \- remote sniffer detection tool
 .SH SYNOPSIS
-.PP
-sniffdet [options] TARGET
-.PP
+.B sniffdet
+.RI [ options ]
+.I target
 .SH DESCRIPTION
+.B sniffdet
+detects machines running in promiscuous mode (i.e., sniffing network traffic)
+using various network-based tests.
+It implements techniques from academic research on remote sniffer detection
+in TCP/IP environments.
 .PP
-Sniffdet is an OpenSource implementation of a set of tests for remote
-sniffers detection in TCP/IP network environments. It is useful for
-remote sniffer detection or to just discover machines which are running
-in promiscuous mode.
-.PP
-Sniffdet is very flexible and allows you to configure many of its options by
-using the config file /etc/sniffdet.conf. It also has plugins support for
-the result of its tests (currently, XML and stdout output are created).
-.PP
-You can see the full documentation at http://sniffdet.sourceforge.net
-.PP
+The tool supports multiple detection tests that can be run individually or
+combined, with configurable parameters via command-line options or a
+configuration file.
 .SH OPTIONS
-TARGET is a canonical hostname or a dotted decimal IPv4 address
+.I target
+is a hostname or IPv4 address in dotted-decimal notation.
 .TP
-\fB-i  --iface=DEVICE\fR
-Use network DEVICE interface for tests.
-.br
-Default is eth0 in linux systems.
+.BR \-i ", " \-\-iface =\fIdevice\fR
+Use network
+.I device
+for tests.
+Default is the first available interface.
 .TP
-\fB-l  --log=FILE\fR
-Use FILE for tests log.
-.br
-Default is none
+.BR \-l ", " \-\-log =\fIfile\fR
+Write test log to
+.IR file .
+Default is no logging.
 .TP
-\fB-c  --configfile=FILE\fR
-Use FILE as configuration file for application.
-.br
-Default is /etc/sniffdet.conf
+.BR \-c ", " \-\-configfile =\fIfile\fR
+Read configuration from
+.IR file .
+Default is
+.IR /etc/sniffdet.conf ,
+with fallback to
+.IR ~/.config/sniffdet/sniffdet.conf .
 .TP
-\fB-f  --hostsfile=FILE\fR
-Use FILE as input for tests target. The file must be in ascii with one
-hostname, IP or net address per line. Comments start with '#'
+.BR \-f ", " \-\-hostsfile =\fIfile\fR
+Read target hosts from
+.IR file ,
+one hostname or IP address per line.
+Lines starting with
+.B #
+are treated as comments.
 .TP
-\fB-u  --uid=UID\fR
-Run program with UID (after dropping root).
-.br
-Default is UID 280 (from config file)
+.BR \-u ", " \-\-uid =\fIuid\fR
+Run as
+.I uid
+after dropping root privileges.
+Default is 280 (configurable).
 .TP
-\fB-g  --gid=GID\fR
-Run program with GID (after dropping root)
-.br
-Default is GID 280 (from config file)
+.BR \-g ", " \-\-gid =\fIgid\fR
+Run as
+.I gid
+after dropping root privileges.
+Default is 280 (configurable).
 .TP
-\fB-t  --test=[testname]\fR
-Perform a specific test(s)
-.br
-Where [testname] is a list composed by at least one of:
-    \fBdns\fR         DNS test
-    \fBarp\fR         ARP response test
-    \fBicmp\fR        ICMP ping response test
-    \fBlatency\fR     ICMP ping latency test
-.br
-.br
-See the full documentation included with the
-.br
-library for information about all tests
+.BR \-t ", " \-\-test =\fItest\fR[,\fItest\fR...]
+Run specific detection test(s).
+Multiple tests can be specified as a comma-separated list.
+Available tests:
+.RS
 .TP
-\fB    --pluginsdir=[directory]\fR
-Select a directory where sniffdet will load plugins from
+.B dns
+DNS test \- triggers reverse DNS lookups on sniffing hosts.
 .TP
-\fB-p  --plugin=[plugin_name]\fR
-Select a plugin to load (xml, stdout, etc).
+.B arp
+ARP test \- exploits promiscuous mode ARP handling.
 .TP
-\fB-f  --targetsfile=[file]\fR
-Scan all targets present in a file with a test.
+.B icmp
+ICMP test \- sends pings with fake MAC addresses.
 .TP
-\fB-v  --verbose\fR
-Run in verbose mode (extra output messages).
-.br
-Default is no.
+.B latency
+Latency test \- measures response time changes under load.
+.RE
 .TP
-\fB-s  --silent\fR
-Run in silent mode (no output messages).
-.br
-Default is no.
+.BI \-\-pluginsdir= directory
+Load plugins from
+.IR directory .
 .TP
-\fB-h, --help\fR
-Show a help screen and exit
+.BR \-p ", " \-\-plugin =\fIname\fR
+Use output plugin
+.I name
+(e.g., xml, stdout).
 .TP
-\fB--version\fR
-Show version information and exit
-.PP
+.BR \-v ", " \-\-verbose
+Enable verbose output.
+.TP
+.BR \-s ", " \-\-silent
+Suppress all output messages.
+.TP
+.BR \-h ", " \-\-help
+Display help and exit.
+.TP
+.B \-\-version
+Display version information and exit.
 .SH EXAMPLES
+Test a host using DNS, ARP, and ICMP tests on a specific interface:
 .PP
-# sniffdet -i eth1 -t dns,arp,icmp foo.localdomain
+.RS
+.EX
+sniffdet \-i enp0s3 \-t dns,arp,icmp 192.168.1.100
+.EE
+.RE
 .PP
-Test the host foo.localdomain with dns, arp and icmp tests using the
-interface eth1
+Run latency test with XML output:
 .PP
+.RS
+.EX
+sniffdet \-t latency \-\-plugin=xml target.example.com
+.EE
+.RE
 .PP
-# sniffdet -i eth0 -t latency foo.localdomain --plugin=xml
+Scan multiple hosts from a file:
 .PP
-Test the machine foo.localdomain using the latency test through the
-interface eth0. Output results using the xml plugin.
+.RS
+.EX
+sniffdet \-f targets.txt \-t icmp
+.EE
+.RE
+.SH FILES
+.TP
+.I /etc/sniffdet.conf
+System-wide configuration file.
+.TP
+.I ~/.config/sniffdet/sniffdet.conf
+User configuration file (takes precedence).
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B non-zero
+An error occurred.
+.SH NOTES
+This tool requires root privileges or appropriate capabilities
+.RB ( CAP_NET_RAW ", " CAP_NET_ADMIN )
+to send raw packets and capture network traffic.
+.PP
+The effectiveness of detection tests depends on the target's network stack
+implementation and may produce false positives or negatives.
 .SH BUGS
-This program can be considered in beta stage since it was not widely tested.
-Your support is appreciated. :-)
+Report bugs at https://github.com/adereis/sniffdet/issues
+.SH AUTHORS
+Ademar de Souza Reis Jr.
+.RI < ademar@ademar.org >
 .br
-.PP
-.PP
-Also see our TODO file.
+Milton Soares Filho
+.RI < eu_mil@yahoo.com >
 .SH SEE ALSO
-.BR sniffdet.conf (5)
-.BR libsniffdet (3)
-.PP
-.BR http://sniffdet.sourceforge.net
+.BR sniffdet.conf (5),
+.BR libsniffdet (3),
+.BR tcpdump (1),
+.BR wireshark (1)
