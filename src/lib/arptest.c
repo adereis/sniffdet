@@ -24,6 +24,7 @@
 #include <libnet.h>
 #include <pcap.h>
 #include <netinet/in.h>
+#include <stdatomic.h>
 #include "libsniffdet.h"
 
 #define DEFAULT_NUMBER_OF_TRIES 10
@@ -43,14 +44,15 @@ static u_char default_source_fake_hw_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x
 // avoid 'simultaneous' calls
 static pthread_mutex_t callback_mutex;
 
-// threads flow control
-static volatile unsigned int timed_out;
-static volatile unsigned int got_suspect;
-static volatile unsigned int got_error;
-static volatile unsigned int exit_status;
+// threads flow control - use atomics for thread-safe access without mutex
+// These are accessed from multiple threads and signal handlers
+static atomic_uint timed_out;
+static atomic_uint got_suspect;
+static atomic_uint got_error;
+static atomic_uint exit_status;
 
 // cancel test flag -- from callback
-static volatile int cancel_test;
+static atomic_int cancel_test;
 
 // These are to calculate test_status.percent
 static unsigned int sender_percent; // 0 to 100%
@@ -328,8 +330,10 @@ cleanup:
 // timeout called when we receive a SIGALRM
 static void timeout_handler(__attribute__((unused)) int signum)
 {
-	timed_out = 1;
+	int saved_errno = errno;
+	atomic_store_explicit(&timed_out, 1, memory_order_release);
 	DEBUG_CODE(printf("DEBUG: Time out ALARM - %s \n", __FILE__););
+	errno = saved_errno;
 }
 
 static void *arptest_sender(void *thread_data)

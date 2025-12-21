@@ -23,6 +23,7 @@
 #include <libnet.h>
 #include <string.h>
 #include <pcap.h>
+#include <stdatomic.h>
 #include "libsniffdet.h"
 
 #define DEFAULT_PROBE_INTERVAL_TIME 50
@@ -38,12 +39,15 @@ static unsigned int bytes_recvd;
 
 // synchro
 static pthread_mutex_t callback_mutex;
-static volatile int got_error = 0;
-static volatile int finished = 0;
-static volatile unsigned int exit_status = 0;
+
+// threads flow control - use atomics for thread-safe access without mutex
+// These are accessed from multiple threads
+static atomic_int got_error;
+static atomic_int finished;
+static atomic_uint exit_status;
 
 // cancel test flag -- from callback
-static volatile int cancel_test;
+static atomic_int cancel_test;
 
 // threads specific
 struct thread_data {

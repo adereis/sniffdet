@@ -30,6 +30,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <string.h>
+#include <stdatomic.h>
 #include "libsniffdet.h"
 
 #define DEFAULT_TIMEOUT 5
@@ -49,9 +50,9 @@ static ulong time_accum;
 static ulong max_time;
 static ulong min_time;
 
-// control flag
-static unsigned short inthread_error;
-static unsigned short thread_timeout;
+// control flags - use atomics for thread-safe access
+static atomic_ushort inthread_error;
+static atomic_ushort thread_timeout;
 
 struct ping_th_data {
 	struct sndet_device *device;
