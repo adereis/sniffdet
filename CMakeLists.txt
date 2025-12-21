@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.31)
 
+# Prevent in-source builds - they pollute the source tree and are hard to clean
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+    message(FATAL_ERROR
+        "In-source builds are not allowed.\n"
+        "Use: cmake -B build\n"
+        "Remove CMakeCache.txt and CMakeFiles/ if they exist in the source directory.")
+endif()
+
 project(sniffdet
     VERSION 0.10.0
     DESCRIPTION "Remote Sniffer Detection Tool/Library"
