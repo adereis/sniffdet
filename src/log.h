@@ -1,18 +1,6 @@
-/*
- *  sniffdet - A tool for network sniffers detection
- *  Copyright (c) 2002, 2003
- *      Ademar de Souza Reis Jr. <ademar@ademar.org>
- *      Milton Soares Filho <eu_mil@yahoo.com>
- *
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; version 2 dated
- *  June, 1991.
- */
-
-/* log.h
- * Simple log system definitions
- */
+// SPDX-License-Identifier: GPL-2.0-only
+//
+// log.h - Simple log system definitions
 
 
 #ifndef SNIFFDET_LOG_H
