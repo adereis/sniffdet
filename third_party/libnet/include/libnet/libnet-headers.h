@@ -32,7 +32,19 @@
 #ifndef __LIBNET_HEADERS_H
 #define __LIBNET_HEADERS_H
 
-/* 
+#include <stdint.h>
+
+/*
+ *  Fixed-width type for 32-bit network protocol fields.
+ *
+ *  Original libnet 1.0 used u_long for 32-bit fields like TCP sequence
+ *  numbers and IP addresses. This worked on 32-bit systems (ILP32) where
+ *  u_long is 4 bytes, but breaks on 64-bit systems (LP64) where u_long
+ *  is 8 bytes. Using uint32_t ensures correct wire format on all platforms.
+ */
+typedef uint32_t libnet_pkt_uint32;
+
+/*
  *  Standard (IPv4) header sizes in bytes.
  */
 
@@ -115,8 +127,8 @@ struct libnet_tcp_hdr
 {
     u_short th_sport;       /* source port */
     u_short th_dport;       /* destination port */
-    u_long th_seq;          /* sequence number */
-    u_long th_ack;          /* acknowledgement number */
+    libnet_pkt_uint32 th_seq;   /* sequence number */
+    libnet_pkt_uint32 th_ack;   /* acknowledgement number */
 #if (LIBNET_LIL_ENDIAN)
     u_char th_x2:4,         /* (unused) */
            th_off:4;        /* data offset */
@@ -304,8 +316,8 @@ struct libnet_icmp_hdr
 #undef icmp_seq
 #define icmp_id     hun.echo.id
 #define icmp_seq    hun.echo.seq
- 
-        u_long gateway;
+
+        libnet_pkt_uint32 gateway;
         struct
         {
             u_short pad;
@@ -325,7 +337,7 @@ struct libnet_icmp_hdr
             struct ip idi_ip;
             /* options and then 64 bits of data */
         }ip;
-        u_long mask;
+        libnet_pkt_uint32 mask;
         char data[1];
 
 #undef icmp_mask
@@ -458,10 +470,10 @@ struct libnet_rip_hdr
     u_short rd;             /* Zero (v1) or Routing Domain (v2) */
     u_short af;             /* Address family */
     u_short rt;             /* Zero (v1) or Route Tag (v2) */
-    u_long addr;            /* IP address */
-    u_long mask;            /* Zero (v1) or Subnet Mask (v2) */
-    u_long next_hop;        /* Zero (v1) or Next hop IP address (v2) */
-    u_long metric;          /* Metric */
+    libnet_pkt_uint32 addr;     /* IP address */
+    libnet_pkt_uint32 mask;     /* Zero (v1) or Subnet Mask (v2) */
+    libnet_pkt_uint32 next_hop; /* Zero (v1) or Next hop IP address (v2) */
+    libnet_pkt_uint32 metric;   /* Metric */
 };
 
 /*
