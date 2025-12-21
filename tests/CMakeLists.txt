@@ -53,3 +53,6 @@ endfunction()
 
 # Add unit tests subdirectory
 add_subdirectory(unit)
+
+# Add integration tests subdirectory (requires root)
+add_subdirectory(integration)

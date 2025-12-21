@@ -117,6 +117,28 @@ cmake -DSNIFFDET_BUILD_TESTS=OFF ..
 on Fedora, `libcmocka-dev` on Debian) for faster builds, or let CMake download
 it automatically via FetchContent.
 
+### Integration Tests
+
+Integration tests verify sniffdet's detection capabilities using a virtual
+network (veth pair) and Python-based responders that simulate vulnerable hosts.
+
+```bash
+# Run integration tests (requires root)
+sudo python3 tests/integration/run_tests.py --build-dir build
+
+# Run specific tests
+sudo python3 tests/integration/run_tests.py --build-dir build --tests icmp,arp
+
+# Via CTest (labels: integration, requires_root)
+cd build
+sudo ctest -L integration --output-on-failure
+```
+
+**Requirements**:
+- Root privileges (CAP_NET_ADMIN + CAP_NET_RAW)
+- Python 3.6+
+- Optional: CAP_SYS_ADMIN for network namespace support (enables negative tests)
+
 ## Usage
 
 ```bash
