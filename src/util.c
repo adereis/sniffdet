@@ -53,6 +53,9 @@ char **parse_targets_file(FILE *f_hosts)
 
 	// + 1 is for NULL termination
 	hostnames = malloc(sizeof (char *) * (MAX_HOSTS + 1));
+	if (hostnames == NULL) {
+		return NULL;
+	}
 
 	while (fgets(buffer, sizeof buffer, f_hosts) != NULL) {
 		if (i >= MAX_HOSTS) {
@@ -66,11 +69,19 @@ char **parse_targets_file(FILE *f_hosts)
 			continue;
 		}
 		hostnames[i] = malloc(strlen(buffer) + 1);
+		if (hostnames[i] == NULL) {
+			// Clean up already-allocated entries
+			hostnames[i] = NULL;
+			free_stringlist(hostnames);
+			return NULL;
+		}
 		strncpy(hostnames[i], buffer, strlen(buffer) + 1);
 
-		// XXX
-		// remove '\n'
-		hostnames[i][strlen(buffer) - 1] = '\0';
+		// Remove trailing newline if present
+		size_t len = strlen(hostnames[i]);
+		if (len > 0 && hostnames[i][len - 1] == '\n') {
+			hostnames[i][len - 1] = '\0';
+		}
 		i++;
 	}
 
@@ -87,12 +98,15 @@ int free_stringlist(char **list)
 {
 	char **temp;
 
+	if (list == NULL) {
+		return 0;
+	}
+
 	temp = list;
-	while(*list) {
+	while (*list) {
 		free(*list);
 		list++;
 	}
-	free(*list); // the last arg -- NULL
 	free(temp);
 
 	return 0; // OK

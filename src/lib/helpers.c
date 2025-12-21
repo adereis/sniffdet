@@ -202,5 +202,5 @@ void sndet_sleep(long sec, long usec)
 
 	tv.tv_sec = sec;
 	tv.tv_usec = usec;
-	select(1, NULL, NULL, NULL, &tv);
+	select(0, NULL, NULL, NULL, &tv);
 }

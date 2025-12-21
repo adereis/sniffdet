@@ -651,6 +651,9 @@ static int dns_query_search4host(int pkt_offset, const u_char *pkt,
 		names[names_len - 1] = '\0';
 
 	inverted_host = string_inversion(host_dotdecimal);
+	if (inverted_host == NULL) {
+		return 0; // allocation failed, can't check
+	}
 	snprintf(buffer, MAX_HOSTNAME_LEN, "%s.in-addr.arpa", inverted_host);
 	SNDET_FREE(inverted_host);
 	if (strstr(names, buffer)) {
@@ -666,6 +669,10 @@ static char *string_inversion(char *string)
 	char *temp = malloc(sizeof(char) * (strlen(string) + 1));
 	int i;
 	int j = 0;
+
+	if (temp == NULL) {
+		return NULL;
+	}
 
 	for (i = strlen(string); i >= 0; i--)
 		temp[j++] = string[i];
