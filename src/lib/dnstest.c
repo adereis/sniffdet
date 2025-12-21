@@ -669,20 +669,42 @@ static int dns_query_search4host(int pkt_offset, const u_char *pkt,
 	return 0;
 }
 
-// just invert a string
+// Reverse the octets of a dotted-decimal IP address for PTR records
+// e.g., "10.0.0.21" -> "21.0.0.10"
 static char *string_inversion(char *string)
 {
 	char *temp = malloc(sizeof(char) * (strlen(string) + 1));
-	int i;
-	int j = 0;
+	char *copy, *token, *saveptr;
+	char *octets[4];
+	int count = 0;
 
 	if (temp == NULL) {
 		return NULL;
 	}
 
-	for (i = strlen(string); i >= 0; i--)
-		temp[j++] = string[i];
-	temp[j] = '\0';
+	// Make a copy since strtok_r modifies the string
+	copy = strdup(string);
+	if (copy == NULL) {
+		free(temp);
+		return NULL;
+	}
 
+	// Split by dots
+	token = strtok_r(copy, ".", &saveptr);
+	while (token != NULL && count < 4) {
+		octets[count++] = token;
+		token = strtok_r(NULL, ".", &saveptr);
+	}
+
+	// Build reversed string
+	if (count == 4) {
+		snprintf(temp, strlen(string) + 1, "%s.%s.%s.%s",
+			octets[3], octets[2], octets[1], octets[0]);
+	} else {
+		// Fallback for malformed input
+		temp[0] = '\0';
+	}
+
+	free(copy);
 	return temp;
 }
