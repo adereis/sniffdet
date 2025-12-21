@@ -135,11 +135,11 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sniffdet.conf
     RENAME sniffdet.conf)
 
 # Man pages
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/sniffdet.1
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/man/sniffdet.1
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/libsniffdet.3
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/man/libsniffdet.3
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man3)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/sniffdet.conf.5
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/man/sniffdet.conf.5
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
 
 # Configuration summary (like the old configure script output)
