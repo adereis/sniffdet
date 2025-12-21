@@ -119,25 +119,12 @@ struct ether_addr * sndet_get_iface_mac_addr(struct sndet_device *sndet_dev, cha
 
 /* pseudo random number generator
  *
- *  TODO: if the host is a linux machine, we could use
- *  the /proc/random interface
- *
- *  Yes, we use a static variable here, but it's not critical and will
- *  not break threaded applications (hopefully) :)
+ * Uses arc4random() which is thread-safe and self-seeding from kernel entropy.
+ * Requires glibc 2.36+ (Aug 2022), BSD, or macOS.
  */
 int sndet_random(void)
 {
-	unsigned int seed;
-	static int s_srandom_called = 0;
-
-	if (!s_srandom_called) {
-		seed = (unsigned int) time(0) ^ (unsigned int) getpid();
-		srandom(seed);
-		s_srandom_called = 1;
-	}
-
-	srandom((unsigned int) time(NULL));
-	return random() % INT_MAX;
+	return (int)(arc4random() % INT_MAX);
 }
 
 

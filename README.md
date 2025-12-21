@@ -32,6 +32,7 @@ traffic) using several techniques:
 
 - CMake 3.16 or later
 - C compiler (GCC, Clang)
+- glibc 2.36+ (for `arc4random`), or BSD/macOS
 - libpcap development headers (`libpcap-devel` on Fedora, `libpcap-dev` on Debian)
 - pthreads support
 
