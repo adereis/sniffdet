@@ -329,6 +329,7 @@ int sndet_dnstest(char *host,
 
 cleanup:
 	pthread_mutex_destroy(&callback_mutex);
+	SNDET_FREE(thdata.iface_mac);
 
 	// calculate final status, result, error code, etc...
 	if (info) {

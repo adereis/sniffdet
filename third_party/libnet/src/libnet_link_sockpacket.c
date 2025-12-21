@@ -167,14 +167,16 @@ bad:
 int
 libnet_close_link_interface(struct libnet_link_int *l)
 {
-    if (close(l->fd) == 0)
-    {
-        return (1);
-    }
-    else
+    int result;
+
+    if (l == NULL)
     {
         return (-1);
     }
+
+    result = (close(l->fd) == 0) ? 1 : -1;
+    free(l);
+    return (result);
 }
 
 

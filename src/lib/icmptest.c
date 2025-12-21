@@ -310,6 +310,7 @@ static void *icmptest_sender(void *thread_data)
 		LIBNET_ETH_H + 56; // using same payload lenght as in a real ping
 	struct icmp_thread_data *td;
 	struct test_status status = {0, 0, 0};
+	u_char *iface_mac = NULL;
 
 	td = (struct icmp_thread_data *)thread_data;
 
@@ -324,14 +325,15 @@ static void *icmptest_sender(void *thread_data)
 	}
 
 	// filling in the packet
-	// TODO - check return values and MAC address
+	// Get MAC address (must be freed at cleanup)
+	iface_mac = (u_char *) sndet_get_iface_mac_addr(td->device, NULL);
 
 	/* int libnet_build_ethernet(u_char *daddr, u_char *saddr, u_short id,
 		const u_char *payload, int payload_s, u_char *buf);
 	*/
 	libnet_build_ethernet(
 		td->fakehwaddr,
-		(u_char *) sndet_get_iface_mac_addr(td->device, NULL),
+		iface_mac,
 		ETHERTYPE_IP,
 		NULL,
 		0,
@@ -434,6 +436,7 @@ static void *icmptest_sender(void *thread_data)
 
 sender_cleanup:
 	libnet_destroy_packet(&pkt);
+	SNDET_FREE(iface_mac);
 
 	pthread_exit(0);
 }
