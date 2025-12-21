@@ -695,15 +695,10 @@ static int parse_testnames(char *names)
 	return count;
 }
 
-/* Copyrigth notice and release
- */
 static void show_version(void)
 {
 	printf("sniffdet %s\n", PACKAGE_VERSION);
-	printf("A Remote Sniffer Detection Tool\n");
-	printf("Copyright (c) 2002\n");
-	printf("   Ademar de Souza Reis Jr. <ademar@ademar.org>\n");
-	printf("   Milton Soares Filho <eu_mil@yahoo.com>\n");
+	printf("License: GPL-2.0-or-later\n");
 }
 
 
