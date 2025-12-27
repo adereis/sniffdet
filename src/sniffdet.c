@@ -296,7 +296,7 @@ int main(int argc, char **argv)
 	}
 	else {
 		targets = malloc(sizeof (char *) * 2);
-		targets[0] = args.target;
+		targets[0] = strdup(args.target);
 		targets[1] = NULL;
 	}
 
