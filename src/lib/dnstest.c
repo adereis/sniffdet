@@ -21,7 +21,7 @@
 #define DEFAULT_DPORT 1150 // whatever
 
 // some non meaning values
-static u_char default_fake_hwaddr[6] = {0x44, 0x44, 0x44, 0x44, 0x11, 0xff};
+static uint8_t default_fake_hwaddr[6] = {0x44, 0x44, 0x44, 0x44, 0x11, 0xff};
 static char *default_fake_ipaddr = "10.0.0.21";
 
 // avoid 'simultaneous' calls
@@ -52,16 +52,16 @@ struct dns_thread_data {
 	int tries;
 	unsigned int send_interval; // time betwen sending loops
 	user_callback callback;
-	u_char *fake_hwaddr;
-	u_char *fake_ipaddr;
-	ushort sport;
-	ushort dport;
+	uint8_t *fake_hwaddr;
+	char *fake_ipaddr; // string form for inet_addr()
+	uint16_t sport;
+	uint16_t dport;
 	char *payload;
-	ushort payload_len;
+	uint16_t payload_len;
 
-	u_long iface_ip;
-	u_long target_ip;
-	u_char *iface_mac;
+	uint32_t iface_ip;
+	uint32_t target_ip;
+	uint8_t iface_mac[6];
 };
 
 // Modules
@@ -75,7 +75,7 @@ static inline int bogus_callback(struct test_status *status, int msg_type,
 static void set_status(struct test_status *st);
 static void handle_in_thread_error(user_callback callback, int my_errno,
 		const char *msg);
-static int dns_query_search4host(int pkt_offset, const u_char *pkt,
+static int dns_query_search4host(int pkt_offset, const uint8_t *pkt,
 		char *hostdotdecimal, int pkt_len);
 static char *string_inversion(char *host);
 
@@ -89,12 +89,12 @@ int sndet_dnstest(const char *host,
 		struct test_info *info,
 
 		// bogus pkt information, optional
-		u_char *fake_ipaddr, // pkt destination
-		u_char *fake_hwaddr, // pkt destination
-		ushort dport,
-		ushort sport,
-		u_char *payload,
-		short int payload_len)
+		char *fake_ipaddr, // pkt destination (string for inet_addr)
+		uint8_t *fake_hwaddr, // pkt destination
+		uint16_t dport,
+		uint16_t sport,
+		uint8_t *payload,
+		uint16_t payload_len)
 {
 	struct in_addr temp_in_addr;
 	struct sigaction sa;
@@ -103,6 +103,7 @@ int sndet_dnstest(const char *host,
 	struct bpf_program bpf;
 	struct test_status status = {0, 0, 0};
 	char filter[PCAP_FILTER_BUFF_SIZE];
+	struct ether_addr *mac;
 
 	// reset cancel flag
 	cancel_test = 0;
@@ -205,7 +206,9 @@ int sndet_dnstest(const char *host,
 	}
 
 	// get mac address from interface
-	thdata.iface_mac = (u_char *) sndet_get_iface_mac_addr(device, NULL);
+	mac = sndet_get_iface_mac_addr(device, NULL);
+	memcpy(thdata.iface_mac, mac, 6);
+	free(mac);
 
 	// get ip address from interface
 	temp_in_addr.s_addr = sndet_get_iface_ip_addr(device, NULL);
@@ -317,7 +320,6 @@ int sndet_dnstest(const char *host,
 
 cleanup:
 	pthread_mutex_destroy(&callback_mutex);
-	SNDET_FREE(thdata.iface_mac);
 
 	// calculate final status, result, error code, etc...
 	if (info) {
@@ -360,13 +362,13 @@ static void *dnstest_sender(void *thread_data)
 {
 	int i, j;
 	struct custom_info bogus_pkt;
-	u_char *pkt[DNS_TEST_PKTS_PER_BURST];
+	uint8_t *pkt[DNS_TEST_PKTS_PER_BURST];
 	unsigned int pkt_size[DNS_TEST_PKTS_PER_BURST];
 	struct dns_thread_data *td;
 	struct test_status status = {0, 0, 0};
 	unsigned short tcp_id_seq;
 	unsigned short tcp_id_ack;
-	u_long aux_source_ip;
+	uint32_t aux_source_ip;
 	char errbuf[LIBSNIFFDET_ERR_BUF_LEN];
 
 	td = (struct dns_thread_data *) thread_data;
@@ -480,7 +482,7 @@ static void *dnstest_receiver(void *thread_data)
 	struct dns_thread_data *td;
 	struct test_status status = {0, 0, 0};
 	struct pcap_pkthdr header;
-	const u_char *pkt;
+	const uint8_t *pkt;
 	// reading poll structures
 	struct timeval read_timeout;
 	const int read_timeout_msec = 500;
@@ -567,7 +569,7 @@ static inline int bogus_callback(
 // just to save lines of code
 static void set_status(struct test_status *st)
 {
-	st->percent = (ushort) sender_percent;
+	st->percent = sender_percent; // 0-100, fits in uint16_t
 	st->bytes_sent = bytes_sent;
 	st->bytes_recvd = bytes_recvd;
 }
@@ -594,7 +596,7 @@ static void handle_in_thread_error(user_callback callback, int my_errno,
 }
 
 // search for a host query inside a dns query packet
-static int dns_query_search4host(int pkt_offset, const u_char *pkt,
+static int dns_query_search4host(int pkt_offset, const uint8_t *pkt,
 		char *host_dotdecimal, int pkt_len)
 {
 	const struct libnet_ip_hdr *ip;

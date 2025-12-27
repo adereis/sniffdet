@@ -3,6 +3,8 @@
 #ifndef SNIFFDET_H
 #define SNIFFDET_H
 
+#include <stdint.h>
+
 #ifndef __LIBNET_H
 #include <libnet.h>
 #endif
@@ -45,8 +47,8 @@ struct config_options {
 		int UID;
 		int GID;
 		char iface[MAX_CFG_VAR_SIZE];
-		u_char fake_hwaddr[6];
-		u_char fake_ipaddr[MAX_CFG_VAR_SIZE];
+		uint8_t fake_hwaddr[6];
+		char fake_ipaddr[MAX_CFG_VAR_SIZE]; // string form for inet_addr()
 	} global;
 
 	// icmptest options
@@ -55,7 +57,7 @@ struct config_options {
 		int timeout;
 		int tries;
 		int interval;
-		u_char fake_hwaddr[6];
+		uint8_t fake_hwaddr[6];
 	} icmptest;
 
 	// arptest options
@@ -64,7 +66,7 @@ struct config_options {
 		int timeout;
 		int tries;
 		int interval;
-		u_char fake_hwaddr[6];
+		uint8_t fake_hwaddr[6];
 	} arptest;
 
 	// dnstest options
@@ -73,12 +75,12 @@ struct config_options {
 		int timeout;
 		int tries;
 		int interval;
-		unsigned short int dport;
-		unsigned short int sport;
-		u_char fake_hwaddr[6];
-		u_char fake_ipaddr[MAX_CFG_VAR_SIZE];
-		unsigned char *payload;
-		unsigned short int payload_len;
+		uint16_t dport;
+		uint16_t sport;
+		uint8_t fake_hwaddr[6];
+		char fake_ipaddr[MAX_CFG_VAR_SIZE]; // string form for inet_addr()
+		uint8_t *payload;
+		uint16_t payload_len;
 	} dnstest;
 
 	// latencytest options

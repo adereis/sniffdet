@@ -21,12 +21,12 @@
 #include "libsniffdet.h"
 
 /* resolve hostname,
- * return IP binary form
+ * return IP binary form (network byte order)
  */
-u_long sndet_resolve(const char *hostname)
+uint32_t sndet_resolve(const char *hostname)
 {
 	struct in_addr inp;
-	u_long temp;
+	u_long temp; // libnet 1.0 returns u_long
 
 	// use inet_aton() just to test if the hostname is
 	// in dotted decimal format
@@ -42,15 +42,15 @@ u_long sndet_resolve(const char *hostname)
 	if (temp == ULONG_MAX) {
 		return 0;
 	} else
-		return temp;
+		return (uint32_t)temp;
 }
 
 
-/* return IP number from an specific interface
+/* return IP number from an specific interface (host byte order)
  */
-u_long sndet_get_iface_ip_addr(struct sndet_device *sndet_dev, char *errbuf)
+uint32_t sndet_get_iface_ip_addr(struct sndet_device *sndet_dev, char *errbuf)
 {
-	u_long ip;
+	u_long ip; // libnet 1.0 returns u_long
 	char ext_errbuf[LIBNET_ERRBUF_SIZE | PCAP_ERRBUF_SIZE];
 
 	// assertion
@@ -68,7 +68,7 @@ u_long sndet_get_iface_ip_addr(struct sndet_device *sndet_dev, char *errbuf)
 		DABORT();
 		return 0;
 	}
-	return ntohl(ip);
+	return (uint32_t)ntohl(ip);
 
 }
 
@@ -121,12 +121,12 @@ int sndet_random(void)
 /* generates a tcp package ready to be inserted in
  * the wire based on custom packet information.
  */
-unsigned char *sndet_gen_tcp_pkt(struct custom_info *custom_pkt,
-		u_char ctrl_flags, int *pkt_len, char *errbuf)
+uint8_t *sndet_gen_tcp_pkt(struct custom_info *custom_pkt,
+		uint8_t ctrl_flags, int *pkt_len, char *errbuf)
 {
-	u_char *pkt;
+	uint8_t *pkt;
 	int pkt_size;
-	ushort urgent_flag = 0;
+	uint16_t urgent_flag = 0;
 #ifdef DEBUG
 	uint mandatory_fields;
 

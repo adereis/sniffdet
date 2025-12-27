@@ -16,7 +16,7 @@
 #define DEFAULT_SEND_INTERVAL 1000
 #define DEFAULT_RECEIVER_HOLD_TO_CANCEL 5
 
-static u_char default_dest_fake_hw_addr[6] = {0xff, 0x00, 0x00, 0x00, 0x00, 0x00};
+static uint8_t default_dest_fake_hw_addr[6] = {0xff, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 /*
  * ok, I just don't know what address to use, so, I'm getting the first one
@@ -24,7 +24,7 @@ static u_char default_dest_fake_hw_addr[6] = {0xff, 0x00, 0x00, 0x00, 0x00, 0x00
  * See http://standards.ieee.org/regauth/oui/index.shtml for assigned MAC
  * numbers.
  */
-static u_char default_source_fake_hw_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+static uint8_t default_source_fake_hw_addr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
 
 // avoid 'simultaneous' calls
 static pthread_mutex_t callback_mutex;
@@ -50,14 +50,14 @@ static unsigned int pkts_recvd;
 struct arp_thread_data {
 	const char *host;
 	int tries;
-	u_char *fakehwaddr;
+	uint8_t *fakehwaddr;
 	user_callback callback;
 	struct sndet_device *device;
 	unsigned int send_interval; // time betwen sending loops
 
-	u_long iface_ip;
-	u_long target_ip;
-	u_char *iface_mac;
+	uint32_t iface_ip;
+	uint32_t target_ip;
+	uint8_t *iface_mac;
 };
 
 // Modules
@@ -80,7 +80,7 @@ int sndet_arptest(const char *host,
 		unsigned int send_interval, // msec
 		user_callback callback,
 		struct test_info *info,
-		u_char *fakehwaddr)
+		uint8_t *fakehwaddr)
 {
 	struct in_addr temp_in_addr;
 	struct sigaction sa;
@@ -159,7 +159,8 @@ int sndet_arptest(const char *host,
 
 #if 0
 	// get mac address from interface
-	thdata.iface_mac = (u_char *) sndet_get_iface_mac_addr(device, NULL);
+	// NOTE: if enabled, would need explicit copy pattern like other tests
+	thdata.iface_mac = (uint8_t *) sndet_get_iface_mac_addr(device, NULL);
 #endif
 	// I'm using a different approach. If I use my real mac addres, there's
 	// a chance that a valid ARP response (due to a valid request generated
@@ -355,9 +356,9 @@ static void *arptest_sender(void *thread_data)
 			4, // PLN - Protocol address lenght
 			ARPOP_REQUEST,
 			td->iface_mac,
-			(u_char *) &td->iface_ip,
+			(uint8_t *) &td->iface_ip,
 			td->fakehwaddr,
-			(u_char *) &td->target_ip,
+			(uint8_t *) &td->target_ip,
 			NULL,
 			0,
 			pkt + ETH_H);
@@ -402,7 +403,7 @@ static void *arptest_receiver(void *thread_data)
 	struct arp_thread_data *td;
 	struct test_status status = {0, 0, 0};
 	struct pcap_pkthdr header;
-	const u_char *pkt;
+	const uint8_t *pkt;
 	// reading poll structures
 	struct timeval read_timeout;
 	const int read_timeout_msec = 500;
@@ -482,7 +483,7 @@ static inline int bogus_callback(
 // just to save lines of code
 static void set_status(struct test_status *st)
 {
-	st->percent = (ushort) sender_percent;
+	st->percent = sender_percent; // 0-100, fits in uint16_t
 	st->bytes_sent = bytes_sent;
 	st->bytes_recvd = bytes_recvd;
 }

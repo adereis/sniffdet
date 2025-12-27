@@ -187,7 +187,7 @@ static void *thread_flooder(__attribute__((unused)) void *td)
 	char errbuf[LIBSNIFFDET_ERR_BUF_LEN];
 	unsigned int pktlen;
 	struct test_status status = {0, 0, 0};
-	u_char *pkt;
+	uint8_t *pkt;
 
 	// check if a full package was provided
 	if (test_bogus_pkt_info(tdata.bogus_pkt)) {
@@ -273,7 +273,7 @@ static struct custom_info *build_default_pkt(struct sndet_device *device)
 	struct custom_info *bogus_pkt;
 
 	// "almost a broadcast" :-)
-	u_char fake_hw_addr[6] = {0xff, 0x00, 0x33, 0x67, 0x12, 0x45};
+	uint8_t fake_hw_addr[6] = {0xff, 0x00, 0x33, 0x67, 0x12, 0x45};
 
 	bogus_pkt = malloc(sizeof(struct custom_info));
 	if (bogus_pkt == NULL) {

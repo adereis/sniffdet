@@ -3,6 +3,7 @@
 #ifndef LIBSNIFFDET_H
 #define LIBSNIFFDET_H
 
+#include <stdint.h>
 #include <stdio.h>
 #include <time.h>
 #include <netdb.h>
@@ -46,9 +47,9 @@
  */
 
 struct test_status {
-	unsigned short int percent; // 0% to 100%
-	unsigned int bytes_sent;
-	unsigned int bytes_recvd;
+	uint16_t percent; // 0% to 100%
+	uint32_t bytes_sent;
+	uint32_t bytes_recvd;
 };
 
 // Message type codes
@@ -117,26 +118,26 @@ struct custom_info {
 	int values_set; // defined values ORed
 
 	// ETH
-	u_char dmac[6];
-	u_char smac[6];
+	uint8_t dmac[6];
+	uint8_t smac[6];
 
 	// IP
-	uint id;
-	uint timestamp;
-	u_char ttl;
-	ulong dest_ip;
-	ulong source_ip;
+	uint32_t id;
+	uint32_t timestamp;
+	uint8_t ttl;
+	uint32_t dest_ip;   // IPv4: always 32 bits
+	uint32_t source_ip; // IPv4: always 32 bits
 
 	// TCP/UDP
-	short protocol; // udp/tcp/icmp
+	short protocol; // udp/tcp/icmp (TODO: consider enum)
 	int flags; // header flags
-	uint seq;
-	uint ack;
-	ushort winsize;
-	short dport;
-	short sport;
+	uint32_t seq;
+	uint32_t ack;
+	uint16_t winsize;
+	uint16_t dport;
+	uint16_t sport;
 	char *payload;
-	short int payload_len; // mandatory if payload is used
+	uint16_t payload_len; // mandatory if payload is used
 };
 
 
@@ -200,10 +201,10 @@ struct dnstest_result {
 
 struct latencytest_result {
 	// time is expressed in msec/10
-	u_int normal_time;
-	u_int min_time;
-	u_int max_time;
-	u_int mean_time;
+	uint32_t normal_time;
+	uint32_t min_time;
+	uint32_t max_time;
+	uint32_t mean_time;
 };
 
 /*
@@ -249,7 +250,7 @@ int sndet_icmptest(const char *host,
 		unsigned int send_interval, // msec
 		user_callback callback,
 		struct test_info *result,
-		u_char *fakehwaddr // optional
+		uint8_t *fakehwaddr // optional
 		);
 
 
@@ -270,7 +271,7 @@ int sndet_arptest(const char *host,
 		unsigned int send_interval, // msec
 		user_callback callback,
 		struct test_info *result,
-		u_char *fakehwaddr // optional
+		uint8_t *fakehwaddr // optional
 		);
 
 
@@ -295,11 +296,11 @@ int sndet_dnstest(const char *host,
 		struct test_info *info,
 
 		// bogus pkt information, optional
-		u_char *fake_ipaddr, // pkt destination
-		u_char *fake_hwaddr, // pkt destination
-		ushort dport, ushort sport,
-		u_char *payload,
-		short int payload_len
+		char *fake_ipaddr, // pkt destination (string for inet_addr)
+		uint8_t *fake_hwaddr, // pkt destination
+		uint16_t dport, uint16_t sport,
+		uint8_t *payload,
+		uint16_t payload_len
 		);
 
 
@@ -361,7 +362,7 @@ int sndet_latencytest_telnetflood(const char *host,
  * an ASCII string representing an IPv4 address (canonical
  * hostname or doted decimal representation).
  */
-u_long sndet_resolve(const char *hostname);
+uint32_t sndet_resolve(const char *hostname);
 
 
 /* returns a pseudo random integer
@@ -391,7 +392,7 @@ int sndet_ping_host(
 /* returns interface ip address in binary notation
  * (host-ordered)
  */
-u_long sndet_get_iface_ip_addr(struct sndet_device *sndet_dev,
+uint32_t sndet_get_iface_ip_addr(struct sndet_device *sndet_dev,
 		char *errbuf);
 
 /* return interface MAC address
@@ -402,8 +403,8 @@ struct ether_addr * sndet_get_iface_mac_addr(struct sndet_device *sndet_dev,
 /* generates a TCP packet based on information supplied in custom_pkt
  * information
  */
-unsigned char *sndet_gen_tcp_pkt(struct custom_info *custom_pkt,
-		u_char ctrl_flags, int *pkt_len, char *errbuf);
+uint8_t *sndet_gen_tcp_pkt(struct custom_info *custom_pkt,
+		uint8_t ctrl_flags, int *pkt_len, char *errbuf);
 
 /* independent and portable way for sleeping
  */

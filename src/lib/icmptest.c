@@ -19,8 +19,8 @@
 #define DEFAULT_SEND_INTERVAL 1000
 #define DEFAULT_RECEIVER_HOLD_TO_CANCEL 5
 
-//static u_char default_fake_hw_addr[6] = {0xff, 0x00, 0x00, 0x00, 0x00, 0x00};
-static u_char default_fake_hw_addr[6] = {0xff, 0x66, 0x66, 0x66, 0x66, 0x66};
+//static uint8_t default_fake_hw_addr[6] = {0xff, 0x00, 0x00, 0x00, 0x00, 0x00};
+static uint8_t default_fake_hw_addr[6] = {0xff, 0x66, 0x66, 0x66, 0x66, 0x66};
 
 // avoid 'simultaneous' calls
 static pthread_mutex_t callback_mutex;
@@ -48,7 +48,7 @@ struct icmp_thread_data {
 	const char *host;
 	int tries;
 	unsigned short int my_icmp_id;
-	u_char *fakehwaddr;
+	uint8_t *fakehwaddr;
 	user_callback callback;
 	struct sndet_device *device;
 	unsigned int send_interval; // time betwen sending loops
@@ -79,7 +79,7 @@ int sndet_icmptest(
 	unsigned int send_interval, // msec
 	user_callback callback,
 	struct test_info *info,
-	u_char *fakehwaddr)
+	uint8_t *fakehwaddr)
 {
 	struct sigaction sa;
 	pthread_t sender_th, receiver_th;
@@ -300,7 +300,8 @@ static void *icmptest_sender(void *thread_data)
 		LIBNET_ETH_H + 56; // using same payload lenght as in a real ping
 	struct icmp_thread_data *td;
 	struct test_status status = {0, 0, 0};
-	u_char *iface_mac = NULL;
+	uint8_t iface_mac[6];
+	struct ether_addr *mac;
 
 	td = (struct icmp_thread_data *)thread_data;
 
@@ -315,12 +316,12 @@ static void *icmptest_sender(void *thread_data)
 	}
 
 	// filling in the packet
-	// Get MAC address (must be freed at cleanup)
-	iface_mac = (u_char *) sndet_get_iface_mac_addr(td->device, NULL);
+	// Get MAC address
+	mac = sndet_get_iface_mac_addr(td->device, NULL);
+	memcpy(iface_mac, mac, 6);
+	free(mac);
 
-	/* int libnet_build_ethernet(u_char *daddr, u_char *saddr, u_short id,
-		const u_char *payload, int payload_s, u_char *buf);
-	*/
+	// libnet 1.0 API uses u_char* for MAC/payload buffers
 	libnet_build_ethernet(
 		td->fakehwaddr,
 		iface_mac,
@@ -426,7 +427,6 @@ static void *icmptest_sender(void *thread_data)
 
 sender_cleanup:
 	libnet_destroy_packet(&pkt);
-	SNDET_FREE(iface_mac);
 
 	pthread_exit(0);
 }
@@ -436,7 +436,7 @@ static void *icmptest_receiver(void *thread_data)
 	struct icmp_thread_data *td;
 	struct test_status status = {0, 0, 0};
 	struct pcap_pkthdr header;
-	const u_char *pkt;
+	const uint8_t *pkt;
 	// reading poll structures
 	struct timeval read_timeout;
 	const int read_timeout_msec = 500;
@@ -516,7 +516,7 @@ static inline int bogus_callback(
 // just to save lines of code
 static void set_status(struct test_status *st)
 {
-	st->percent = (ushort)sender_percent;
+	st->percent = sender_percent; // 0-100, fits in uint16_t
 	st->bytes_sent = bytes_sent;
 	st->bytes_recvd = bytes_recvd;
 }

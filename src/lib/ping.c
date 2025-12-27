@@ -29,15 +29,15 @@
 // using same size as in real ping application
 
 // statistic variables
-static ulong pkts_sent;
-static ulong pkts_rcvd;
-static ulong time_accum;
-static ulong max_time;
-static ulong min_time;
+static unsigned long pkts_sent;
+static unsigned long pkts_rcvd;
+static unsigned long time_accum;
+static unsigned long max_time;
+static unsigned long min_time;
 
 // control flags - use atomics for thread-safe access
-static atomic_ushort inthread_error;
-static atomic_ushort thread_timeout;
+static atomic_uint inthread_error;
+static atomic_uint thread_timeout;
 
 struct ping_th_data {
 	struct sndet_device *device;
@@ -46,19 +46,19 @@ struct ping_th_data {
 	unsigned int burst_size;
 	char *errmsg;
 	/*
-	u_long ipsaddr;
-	u_long ipdaddr;
+	uint32_t ipsaddr;
+	uint32_t ipdaddr;
 	*/
-	u_char *pkt;
-	u_short my_icmp_id;
+	uint8_t *pkt;
+	uint16_t my_icmp_id;
 };
 
 /* returns difference in 0.1 msecs */
-static ulong ping_sub_tv(struct timeval *first, struct timeval *last);
+static unsigned long ping_sub_tv(struct timeval *first, struct timeval *last);
 
 /* general initializers */
-static unsigned char * init_ping_packet(ulong ipsaddr,
-	ulong ipdaddr, char *errmsg);
+static unsigned char * init_ping_packet(uint32_t ipsaddr,
+	uint32_t ipdaddr, char *errmsg);
 static int init_ping_filter(struct sndet_device *device,
 	unsigned short my_id, const char *host, char *errmsg);
 
@@ -183,7 +183,7 @@ int sndet_ping_host(
 
 /* Returns the difference in 0.1 milliseconds between time values
  */
-static ulong ping_sub_tv(struct timeval *first, struct timeval *last)
+static unsigned long ping_sub_tv(struct timeval *first, struct timeval *last)
 {
 	if (last->tv_usec < first->tv_usec) {
 		return (last->tv_sec - first->tv_sec - 1) * 10000 +
@@ -205,8 +205,8 @@ static ulong ping_sub_tv(struct timeval *first, struct timeval *last)
 /* Sets the frame for a correct icmp request for the target host
  * return NULL if error
  */
-static unsigned char * init_ping_packet(ulong ipsaddr,
-	ulong ipdaddr, char *errmsg)
+static unsigned char * init_ping_packet(uint32_t ipsaddr,
+	uint32_t ipdaddr, char *errmsg)
 {
 	unsigned char *pkt;
 
@@ -361,14 +361,14 @@ static void *ping_thread_sender(void *arg)
  */
 static void *ping_thread_catcher(void *arg)
 {
-	const u_char *pkt;
+	const uint8_t *pkt;
 	struct pcap_pkthdr pcap_h;
 	struct ping_th_data *th;
 	struct timeval senttime, read_timeout;
 	const int read_timeout_msec = 500;
 	fd_set fds;
 	int devfd;
-	ulong diff;
+	unsigned long diff;
 	int selret;
 
 	DEBUG_CODE(printf("PING CATCHER: entering thread\n"));
