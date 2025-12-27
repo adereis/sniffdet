@@ -36,7 +36,7 @@ static atomic_int cancel_test;
 
 // threads specific
 struct thread_data {
-	char *host;
+	const char *host;
 	struct sndet_device *device;
 	struct custom_info *bogus_pkt;
 	unsigned int tmout;
@@ -49,7 +49,7 @@ static struct thread_data tdata;
 static void *thread_flooder(void *td);
 static void *thread_pinger(void *td);
 static inline int bogus_callback(struct test_status *status, int msg_type,
-	char *msg);
+	const char *msg);
 static int test_bogus_pkt_info(struct custom_info *bogus_pkt);
 static struct custom_info *build_default_pkt(struct sndet_device *device);
 
@@ -64,7 +64,7 @@ static void set_status(struct test_status *st);
  * Results are given in usec (max resolution)
  */
 int sndet_latencytest_pktflood(
-		char *host,
+		const char *host,
 		struct sndet_device *device,
 		unsigned int tmout, // seconds
 		unsigned int probe_interval, // msecs
@@ -341,7 +341,7 @@ static int test_bogus_pkt_info(struct custom_info *bogus_pkt)
 static inline int bogus_callback(
 		__attribute__((unused)) struct test_status *status,
 		__attribute__((unused)) int msg_type,
-		__attribute__((unused)) char *msg)
+		__attribute__((unused)) const char *msg)
 {
 	// do nothing
 	return 0;

@@ -45,7 +45,7 @@ static unsigned int pkts_recvd;
 
 
 struct icmp_thread_data {
-	char *host;
+	const char *host;
 	int tries;
 	unsigned short int my_icmp_id;
 	u_char *fakehwaddr;
@@ -62,17 +62,17 @@ static void *icmptest_sender(void *thread_data);
 static void *icmptest_receiver(void *thread_data);
 
 static inline int bogus_callback(struct test_status *status, int msg_type,
-	char *msg);
+	const char *msg);
 
 // Internal Helpers
 static void set_status(struct test_status *st);
 
 static void handle_in_thread_error(user_callback callback, int my_errno,
-	char *msg);
+	const char *msg);
 
 // Main test thread
 int sndet_icmptest(
-	char *host,
+	const char *host,
 	struct sndet_device *device,
 	unsigned int tmout,
 	unsigned int tries,
@@ -507,7 +507,7 @@ static void *icmptest_receiver(void *thread_data)
 static inline int bogus_callback(
 		__attribute__((unused)) struct test_status *status,
 		__attribute__((unused)) int msg_type,
-		__attribute__((unused)) char *msg)
+		__attribute__((unused)) const char *msg)
 {
 	// do nothing
 	return 0;
@@ -524,7 +524,7 @@ static void set_status(struct test_status *st)
 // Commom error handling code inside threads
 // just to save code space
 static void handle_in_thread_error(user_callback callback, int my_errno,
-	char *msg)
+	const char *msg)
 {
 	struct test_status status = {0, 0, 0};
 

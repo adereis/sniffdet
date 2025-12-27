@@ -112,7 +112,7 @@ struct config_variables_t {
 
 // parser variables
 extern struct config_options config;
-static char *f_name;
+static const char *f_name;
 static FILE *conf_file;
 static char line_buffer[BUFF_SIZE];
 static int line;
@@ -382,7 +382,7 @@ static struct config_variables_t config_vars[] = {
 	},
 };
 
-int read_config(char *filename)
+int read_config(const char *filename)
 {
 	int status;
 	f_name = filename;

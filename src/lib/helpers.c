@@ -23,7 +23,7 @@
 /* resolve hostname,
  * return IP binary form
  */
-u_long sndet_resolve(char *hostname)
+u_long sndet_resolve(const char *hostname)
 {
 	struct in_addr inp;
 	u_long temp;

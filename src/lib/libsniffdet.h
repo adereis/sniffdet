@@ -64,7 +64,7 @@ struct test_status {
  * cancel the test. If it returns anything != 0, we cancel the test
  */
 typedef int (*user_callback)(struct test_status *status,
-	int msg_type, char *msg);
+	int msg_type, const char *msg);
 
 
 /*
@@ -161,7 +161,7 @@ struct sndet_device {
 /* initialize/open device
  * Must be done as root user
  */
-struct sndet_device * sndet_init_device(char *device, int promisc, char *errbuf);
+struct sndet_device * sndet_init_device(const char *device, int promisc, char *errbuf);
 
 /* finish/close device */
 int sndet_finish_device(struct sndet_device *device, char *errbuf);
@@ -242,7 +242,7 @@ struct test_info {
  * mandatory:
  *     host, device
  */
-int sndet_icmptest(char *host,
+int sndet_icmptest(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout, //secs
 		unsigned int tries,
@@ -263,7 +263,7 @@ int sndet_icmptest(char *host,
  * Mandatory:
  *     host, device
  */
-int sndet_arptest(char *host,
+int sndet_arptest(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout, // secs
 		unsigned int tries,
@@ -286,7 +286,7 @@ int sndet_arptest(char *host,
  * Mandatory:
  *     host, device
  */
-int sndet_dnstest(char *host,
+int sndet_dnstest(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout, // secs
 		unsigned int tries,
@@ -313,7 +313,7 @@ int sndet_dnstest(char *host,
  */
 
 // single packet flood
-int sndet_latencytest_pktflood(char *host,
+int sndet_latencytest_pktflood(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout, // secs
 		unsigned int probe_interval, // x10 msec
@@ -324,7 +324,7 @@ int sndet_latencytest_pktflood(char *host,
 		);
 
 // POP session simulation flood
-int sndet_latencytest_popflood(char *host,
+int sndet_latencytest_popflood(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout, // secs
 		unsigned int num_bursts,
@@ -338,7 +338,7 @@ int sndet_latencytest_popflood(char *host,
 		);
 
 // Telnet session simulation flood
-int sndet_latencytest_telnetflood(char *host,
+int sndet_latencytest_telnetflood(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout, // secs
 		unsigned int num_bursts,
@@ -361,7 +361,7 @@ int sndet_latencytest_telnetflood(char *host,
  * an ASCII string representing an IPv4 address (canonical
  * hostname or doted decimal representation).
  */
-u_long sndet_resolve(char *hostname);
+u_long sndet_resolve(const char *hostname);
 
 
 /* returns a pseudo random integer
@@ -380,7 +380,7 @@ struct sndet_ping_result {
 };
 
 int sndet_ping_host(
-	char *host,
+	const char *host,
 	struct sndet_device *device,
 	long tmout, // secs
 	long send_interval, // x 0.1 msecs

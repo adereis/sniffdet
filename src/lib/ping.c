@@ -60,7 +60,7 @@ static ulong ping_sub_tv(struct timeval *first, struct timeval *last);
 static unsigned char * init_ping_packet(ulong ipsaddr,
 	ulong ipdaddr, char *errmsg);
 static int init_ping_filter(struct sndet_device *device,
-	unsigned short my_id, char *host, char *errmsg);
+	unsigned short my_id, const char *host, char *errmsg);
 
 /* threads prototypes */
 static void *ping_thread_sender(void *arg);
@@ -71,7 +71,7 @@ static void *ping_thread_catcher(void *arg);
  * returns non zero if failed
  */
 int sndet_ping_host(
-	char *host,
+	const char *host,
 	struct sndet_device *device,
 	long tmout, // secs
 	long send_interval, // msecs
@@ -243,7 +243,7 @@ static unsigned char * init_ping_packet(ulong ipsaddr,
  * return non zero if error
  */
 static int init_ping_filter(struct sndet_device *device,
-	unsigned short my_id, char *host, char *errmsg)
+	unsigned short my_id, const char *host, char *errmsg)
 {
 	struct bpf_program bpf;
 	char filter[PCAP_FILTER_BUFF_SIZE];

@@ -48,7 +48,7 @@ static unsigned int pkts_recvd;
 
 
 struct arp_thread_data {
-	char *host;
+	const char *host;
 	int tries;
 	u_char *fakehwaddr;
 	user_callback callback;
@@ -65,15 +65,15 @@ static void timeout_handler(int signum);
 static void *arptest_sender(void *thread_data);
 static void *arptest_receiver(void *thread_data);
 static inline int bogus_callback(struct test_status *status, int msg_type,
-	char *msg);
+	const char *msg);
 
 // Internal Helpers
 static void set_status(struct test_status *st);
 static void handle_in_thread_error(user_callback callback, int my_errno,
-	char *msg);
+	const char *msg);
 
 // Main test thread
-int sndet_arptest(char *host,
+int sndet_arptest(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout,
 		unsigned int tries,
@@ -473,7 +473,7 @@ static void *arptest_receiver(void *thread_data)
 static inline int bogus_callback(
 		__attribute__((unused)) struct test_status *status,
 		__attribute__((unused)) int msg_type,
-		__attribute__((unused)) char *msg)
+		__attribute__((unused)) const char *msg)
 {
 	// do nothing :)
 	return 0;
@@ -490,7 +490,7 @@ static void set_status(struct test_status *st)
 // Commom error handling code inside threads
 // just to save some lines of code
 static void handle_in_thread_error(user_callback callback, int my_errno,
-	char *msg)
+	const char *msg)
 {
 	struct test_status status = {0, 0, 0};
 

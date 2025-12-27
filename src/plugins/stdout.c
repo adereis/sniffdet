@@ -22,7 +22,7 @@ static int (*print_tests_results[MAX_TESTS + 1]) (
 			print_latencytest_results,
 			NULL };
 
-int test_output(char *target, struct test_info info[],
+int test_output(const char *target, struct test_info info[],
 		struct config_options config,
 		__attribute__((unused)) char *errbuf)
 {

@@ -6,7 +6,7 @@
 #include "../sniffdet.h" // XXX
 #include "plugins.h"
 
-static int xml_output(char *target, char *file, struct test_info info[],
+static int xml_output(const char *target, const char *file, struct test_info info[],
 		int verbose, char *errbuf);
 static int print_icmptest_results(struct test_info info, int verbose);
 static int print_arptest_results(struct test_info info, int verbose);
@@ -29,15 +29,15 @@ static int (*print_tests_results[MAX_TESTS + 1]) (struct test_info info,
 			NULL
 		};
 
-int test_output(char *target, struct test_info info[],
+int test_output(const char *target, struct test_info info[],
 		struct config_options config, char *errbuf)
 {
 	return xml_output(target, config.plugins.xml.filename, info,
 			config.global.verbose, errbuf);
 }
 
-static int xml_output(__attribute__((unused)) char *target,
-		char *filename,
+static int xml_output(__attribute__((unused)) const char *target,
+		const char *filename,
 		struct test_info info[],
 		__attribute__((unused)) int verbose,
 		__attribute__((unused)) char *errbuf)

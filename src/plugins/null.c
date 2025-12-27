@@ -5,7 +5,7 @@
 #include "../sniffdet.h" // XXX
 #include "plugins.h"
 
-int test_output(__attribute__((unused)) char *target,
+int test_output(__attribute__((unused)) const char *target,
 		__attribute__((unused)) struct test_info info[],
 		__attribute__((unused)) struct config_options config,
 		__attribute__((unused)) char *errbuf)

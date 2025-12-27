@@ -26,7 +26,7 @@
  *   by the application;
  * - Error message is returned in errbuf[];
  */
-struct sndet_device * sndet_init_device(char *device, int promisc, char *errbuf)
+struct sndet_device * sndet_init_device(const char *device, int promisc, char *errbuf)
 {
 	struct sndet_device *sndet_dev;
 	char *temp;

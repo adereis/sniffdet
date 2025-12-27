@@ -13,10 +13,10 @@
  * configuration options.
  */
 struct arguments {
-	char *prgname;
-	char *configfile;
-	char *targetsfile;
-	char *target;
+	const char *prgname;
+	const char *configfile;
+	const char *targetsfile;
+	const char *target;
 };
 
 /* struct with general options
@@ -117,6 +117,6 @@ struct snd_tests {
 	short int latencytest;
 };
 
-int read_config(char *filename);
+int read_config(const char *filename);
 
 #endif // SNIFFDET_H

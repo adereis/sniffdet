@@ -47,7 +47,7 @@ static unsigned int pkts_recvd;
 
 // information passed to threads
 struct dns_thread_data {
-	char *host;
+	const char *host;
 	struct sndet_device *device;
 	int tries;
 	unsigned int send_interval; // time betwen sending loops
@@ -69,18 +69,18 @@ static void timeout_handler(int signum);
 static void *dnstest_sender(void *thread_data);
 static void *dnstest_receiver(void *thread_data);
 static inline int bogus_callback(struct test_status *status, int msg_type,
-		char *msg);
+		const char *msg);
 
 // Internal Helpers
 static void set_status(struct test_status *st);
 static void handle_in_thread_error(user_callback callback, int my_errno,
-		char *msg);
+		const char *msg);
 static int dns_query_search4host(int pkt_offset, const u_char *pkt,
 		char *hostdotdecimal, int pkt_len);
 static char *string_inversion(char *host);
 
 // Main test thread
-int sndet_dnstest(char *host,
+int sndet_dnstest(const char *host,
 		struct sndet_device *device,
 		unsigned int tmout,
 		unsigned int tries,
@@ -558,7 +558,7 @@ static void *dnstest_receiver(void *thread_data)
 static inline int bogus_callback(
 		__attribute__((unused)) struct test_status *status,
 		__attribute__((unused)) int msg_type,
-		__attribute__((unused)) char *msg)
+		__attribute__((unused)) const char *msg)
 {
 	// do nothing :)
 	return 0;
@@ -575,7 +575,7 @@ static void set_status(struct test_status *st)
 // Commom error handling code inside threads
 // just to save code space
 static void handle_in_thread_error(user_callback callback, int my_errno,
-	char *msg)
+	const char *msg)
 {
 	struct test_status status = {0, 0, 0};
 

@@ -18,7 +18,7 @@
 #ifndef SNIFFDET_PLUGINS_H
 #define SNIFFDET_PLUGINS_H
 
-int test_output(char *target, struct test_info info[],
+int test_output(const char *target, struct test_info info[],
 		struct config_options config, char *errbuf);
 
 #endif // SNIFFDET_PLUGINS_H

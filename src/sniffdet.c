@@ -92,7 +92,7 @@ static const char *find_plugins_dir(void)
 
 // function prototypes
 static int tests_msg_callback(struct test_status *status,
-		const int msg_type, char *msg);
+		int msg_type, const char *msg);
 static void set_global_defaults(void);
 static void scan_args(int argc, char **argv);
 static int parse_testnames(char *names);
@@ -122,7 +122,7 @@ static int cancel_tests = 0;
  */
 
 static int tests_msg_callback(struct test_status *status,
-		const int msg_type, char *msg)
+		int msg_type, const char *msg)
 {
 #ifdef DEBUG_CALLBACK
 	static char *msgs[7] = {
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
 
 	// output plugin
 	void *o_plugin;
-	int (*test_output)(char *, struct test_info *, struct config_options, char *);
+	int (*test_output)(const char *, struct test_info *, struct config_options, char *);
 
 	// set everything in config struct to NULL (zero)
 	memset(&config, 0, sizeof(struct config_options));

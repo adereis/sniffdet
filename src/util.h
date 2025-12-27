@@ -7,7 +7,7 @@
 
 int drop_root(int uid, int gid);
 char **parse_targets_file(FILE *f_hosts);
-char **network_ips(char *netmask, char *network);
+char **network_ips(const char *netmask, const char *network);
 int free_stringlist(char **list);
 
 #endif // SNIFFDET_UTIL_H
