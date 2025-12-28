@@ -247,6 +247,16 @@ def run_sniffdet(
 ) -> Tuple[int, str]:
     """Run sniffdet with the given parameters."""
     cmd = [str(binary), "-i", iface, "-t", test_type, target_ip]
+
+    # Use plugins from the build directory
+    plugins_dir = find_plugins_dir(binary)
+    if plugins_dir:
+        cmd.extend(["--pluginsdir", str(plugins_dir)])
+
+    # Keep running as root to access files in user home directories
+    # (default drops to nobody which can't access /home/*)
+    cmd.extend(["-u", "0", "-g", "0"])
+
     if extra_args:
         cmd.extend(extra_args)
 
@@ -377,6 +387,15 @@ def find_sniffdet_binary(build_dir: Optional[Path] = None) -> Optional[Path]:
         if candidate.exists():
             return candidate
 
+    return None
+
+
+def find_plugins_dir(binary: Path) -> Optional[Path]:
+    """Find the plugins directory relative to the binary."""
+    # Plugins are built alongside the binary in src/plugins/
+    plugins_dir = binary.parent / "plugins"
+    if plugins_dir.is_dir():
+        return plugins_dir
     return None
 
 
