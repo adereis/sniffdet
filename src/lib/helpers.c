@@ -122,10 +122,10 @@ int sndet_random(void)
  * the wire based on custom packet information.
  */
 uint8_t *sndet_gen_tcp_pkt(struct custom_info *custom_pkt,
-		uint8_t ctrl_flags, int *pkt_len, char *errbuf)
+		uint8_t ctrl_flags, unsigned int *pkt_len, char *errbuf)
 {
 	uint8_t *pkt;
-	int pkt_size;
+	unsigned int pkt_size;
 	uint16_t urgent_flag = 0;
 #ifdef DEBUG
 	uint mandatory_fields;

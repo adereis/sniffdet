@@ -34,13 +34,25 @@ option(SNIFFDET_BUILD_CLI "Build the sniffdet command-line tool" ON)
 option(SNIFFDET_BUILD_TESTS "Build the test suite" ON)
 option(SNIFFDET_ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
 
-# Compiler warnings - strict but tolerant of legacy patterns
+# Compiler warnings
+# Start with original 2002 flags, then add modern warnings incrementally
 add_compile_options(
+    # === Baseline (always enabled) ===
     -Wall
     -Wextra
-    -Wno-unused-parameter      # Legacy code has many unused params in callbacks
-    -Wno-missing-field-initializers
+
+    # === Original 2002 flags (from Autotools era) ===
+    -Wmissing-declarations    # Warn if global function lacks prior declaration
+    -Wmissing-prototypes      # Warn if function defined without prototype
+    -Wredundant-decls         # Warn about redundant declarations
+    -Wshadow                  # Warn when variable shadows another
+    -Wbad-function-cast       # Warn about dubious function pointer casts
+    -Wcast-qual               # Warn when cast removes const/volatile
+
+    # === Suppressions for legacy patterns ===
+    -Wno-unused-parameter     # Callbacks have many unused params by design
 )
+# Note: vendored libnet has its own suppressions in third_party/libnet/CMakeLists.txt
 
 # Sanitizers (for development/debugging)
 if(SNIFFDET_ENABLE_SANITIZERS)

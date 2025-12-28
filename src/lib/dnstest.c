@@ -56,7 +56,7 @@ struct dns_thread_data {
 	char *fake_ipaddr; // string form for inet_addr()
 	uint16_t sport;
 	uint16_t dport;
-	char *payload;
+	uint8_t *payload;
 	uint16_t payload_len;
 
 	uint32_t iface_ip;
@@ -599,8 +599,6 @@ static void handle_in_thread_error(user_callback callback, int my_errno,
 static int dns_query_search4host(int pkt_offset, const uint8_t *pkt,
 		char *host_dotdecimal, int pkt_len)
 {
-	const struct libnet_ip_hdr *ip;
-	const struct libnet_udp_hdr *udp;
 	const struct libnet_dns_hdr *dns;
 	const char *data;
 	char names[512] = "";
@@ -609,8 +607,9 @@ static int dns_query_search4host(int pkt_offset, const uint8_t *pkt,
 	int left_bytes = pkt_len;
 	int cnt;
 
-	ip  = (const struct libnet_ip_hdr *) (pkt + pkt_offset);
-	udp = (const struct libnet_udp_hdr *) (pkt + pkt_offset + LIBNET_IP_H);
+	/* Packet layout: [ethernet][IP][UDP][DNS][query data]
+	 * We skip directly to the DNS header using fixed offsets.
+	 */
 	dns = (const struct libnet_dns_hdr *) (pkt + pkt_offset + LIBNET_IP_H +
 			LIBNET_UDP_H);
 	data = (const char *) (pkt + pkt_offset + LIBNET_IP_H + LIBNET_UDP_H +

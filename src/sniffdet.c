@@ -503,11 +503,8 @@ static void set_global_defaults(void)
 
 	args.target = NULL;
 	args.targetsfile = NULL;
-	/* Use XDG search path for config file.
-	 * Cast needed because struct arguments uses char* instead of const char*
-	 * (a pre-existing const-correctness issue).
-	 */
-	args.configfile = (char *)find_config_file();
+	// Use XDG search path for config file
+	args.configfile = find_config_file();
 
 	// no tests by default
 	run_tests.dnstest = 0;

@@ -136,7 +136,7 @@ struct custom_info {
 	uint16_t winsize;
 	uint16_t dport;
 	uint16_t sport;
-	char *payload;
+	uint8_t *payload;     // raw byte data for packet payload
 	uint16_t payload_len; // mandatory if payload is used
 };
 
@@ -404,7 +404,7 @@ struct ether_addr * sndet_get_iface_mac_addr(struct sndet_device *sndet_dev,
  * information
  */
 uint8_t *sndet_gen_tcp_pkt(struct custom_info *custom_pkt,
-		uint8_t ctrl_flags, int *pkt_len, char *errbuf);
+		uint8_t ctrl_flags, unsigned int *pkt_len, char *errbuf);
 
 /* independent and portable way for sleeping
  */
