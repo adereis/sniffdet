@@ -202,7 +202,7 @@ static struct config_variables_t config_vars[] = {
 		}
 	},
 	{ CFG_VAR_LOGFILENAME,		get_string,
-		{ &(config.global.logfilename),
+		{ &(config.global.logfile_path),
 			NULL,
 			NULL,
 			NULL,
@@ -368,7 +368,7 @@ static struct config_variables_t config_vars[] = {
 			NULL,
 			NULL,
 			NULL,
-			&(config.plugins.xml.filename)
+			&(config.plugins.xml.output_path)
 		}
 	},
 	{ NULL,						NULL,

@@ -131,7 +131,7 @@ static void test_config_parse_global_strings(void **state)
 
     assert_int_equal(result, 0);
     assert_string_equal(config.global.iface, "eth1");
-    assert_string_equal(config.global.logfilename, "test.log");
+    assert_string_equal(config.global.logfile_path, "test.log");
     assert_string_equal(config.global.plugin, "myplugin.so");
 }
 
@@ -313,7 +313,7 @@ static void test_config_parse_plugins(void **state)
     free(path);
 
     assert_int_equal(result, 0);
-    assert_string_equal(config.plugins.xml.filename, "output.xml");
+    assert_string_equal(config.plugins.xml.output_path, "output.xml");
 }
 
 /*

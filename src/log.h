@@ -16,7 +16,11 @@
 #define LOG_USE_STDOUT   0x01 << 2
 #define LOG_USE_STDERR   0x01 << 3
 
+// Buffer for user-provided message content
 #define MAX_LOG_MSG_LEN 512
+// Buffer for formatted output (message + timestamp prefix + newline)
+// Generous size to silence compiler truncation warnings
+#define MAX_LOG_OUTPUT_LEN 1024
 int mylog(unsigned int ltype, int fd, const char *format, ...);
 
 #endif // SNIFFDET_LOG_H

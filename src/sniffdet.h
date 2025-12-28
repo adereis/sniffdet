@@ -4,6 +4,7 @@
 #define SNIFFDET_H
 
 #include <stdint.h>
+#include <limits.h>
 
 #ifndef __LIBNET_H
 #include <libnet.h>
@@ -25,8 +26,8 @@ struct arguments {
  * They're read from config file or came from comand line
  * arguments
  */
-#define MAX_CFG_VAR_SIZE 128
-#define MAX_CFG_BIG_VAR_SIZE 1024
+#define MAX_CFG_VAR_SIZE 128        // Short strings (interface names, IPs)
+#define MAX_PATH_SIZE PATH_MAX      // Filesystem paths
 
 /* if you change some type here, remember
  * to also change the handler for the config file..
@@ -41,9 +42,9 @@ struct config_options {
 		int verbose;
 		int silent;
 		unsigned int logtype;
-		char logfilename[MAX_CFG_VAR_SIZE];
-		char plugins_dir[MAX_CFG_VAR_SIZE];
-		char plugin[MAX_CFG_VAR_SIZE];
+		char logfile_path[MAX_PATH_SIZE];
+		char plugins_dir[MAX_PATH_SIZE];
+		char plugin[MAX_CFG_VAR_SIZE];      // just filename, not full path
 		int UID;
 		int GID;
 		char iface[MAX_CFG_VAR_SIZE];
@@ -94,7 +95,7 @@ struct config_options {
 	// plugins options
 	struct {
 		struct {
-			char filename[MAX_CFG_VAR_SIZE];
+			char output_path[MAX_PATH_SIZE];
 		} xml;
 	} plugins;
 };

@@ -32,7 +32,7 @@ static int (*print_tests_results[MAX_TESTS + 1]) (struct test_info info,
 int test_output(const char *target, struct test_info info[],
 		struct config_options config, char *errbuf)
 {
-	return xml_output(target, config.plugins.xml.filename, info,
+	return xml_output(target, config.plugins.xml.output_path, info,
 			config.global.verbose, errbuf);
 }
 

@@ -29,7 +29,7 @@ int mylog(unsigned int ltype, int log_fd, const char *format, ...)
 {
 	va_list ap;
 	char bufmsg[MAX_LOG_MSG_LEN];
-	char log_text[MAX_LOG_MSG_LEN];
+	char log_text[MAX_LOG_OUTPUT_LEN];
 	char *s_time;
 	time_t curr_time;
 
@@ -47,7 +47,7 @@ int mylog(unsigned int ltype, int log_fd, const char *format, ...)
 	// file (includes timestring)
 	if (ltype & LOG_USE_FILE) {
 		if (log_fd != -1) {
-			snprintf(log_text, MAX_LOG_MSG_LEN, "[%s:%02d]: %s\n", s_time,
+			snprintf(log_text, MAX_LOG_OUTPUT_LEN, "[%s:%02d]: %s\n", s_time,
 					(int) curr_time % 60, bufmsg);
 			write(log_fd, log_text, strlen(log_text));
 		} else {
@@ -62,13 +62,13 @@ int mylog(unsigned int ltype, int log_fd, const char *format, ...)
 
 	// stdout (no timestring)
 	if (ltype & LOG_USE_STDOUT) {
-		snprintf(log_text, MAX_LOG_MSG_LEN, "%s\n", bufmsg);
+		snprintf(log_text, MAX_LOG_OUTPUT_LEN, "%s\n", bufmsg);
 		write(STDOUT_FILENO, log_text, strlen(log_text));
 	}
 
 	// stderr (no timestring)
 	if (ltype & LOG_USE_STDERR) {
-		snprintf(log_text, MAX_LOG_MSG_LEN, "%s\n", bufmsg);
+		snprintf(log_text, MAX_LOG_OUTPUT_LEN, "%s\n", bufmsg);
 		write(STDERR_FILENO, log_text, strlen(log_text));
 	}
 

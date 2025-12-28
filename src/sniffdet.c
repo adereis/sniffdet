@@ -217,15 +217,15 @@ int main(int argc, char **argv)
 	scan_args(argc, argv);
 
 	// open log file
-	if ((config.global.logfilename[0] != '\0') &&
+	if ((config.global.logfile_path[0] != '\0') &&
 			(config.global.logtype & LOG_USE_FILE)) {
-		logfd = open(config.global.logfilename, O_APPEND|O_WRONLY|O_CREAT, 0644);
+		logfd = open(config.global.logfile_path, O_APPEND|O_WRONLY|O_CREAT, 0644);
 		if (logfd == -1) {
 			fprintf(stderr, "Error opening log file: %s\n",
-					config.global.logfilename);
+					config.global.logfile_path);
 			perror("");
 			fprintf(stderr, "Log disabled\n");
-			config.global.logfilename[0] = '\0';
+			config.global.logfile_path[0] = '\0';
 		}
 	}
 
@@ -323,7 +323,11 @@ int main(int argc, char **argv)
 	}
 
 	// open output plugin
-	snprintf(plugin_path, PATH_MAX, "%s/%s", config.global.plugins_dir, config.global.plugin);
+	if ((size_t)snprintf(plugin_path, PATH_MAX, "%s/%s",
+			config.global.plugins_dir, config.global.plugin) >= PATH_MAX) {
+		fprintf(stderr, "Warning: plugin path truncated (max %d chars)\n",
+				PATH_MAX - 1);
+	}
 	if (config.global.verbose) {
 		mylog(config.global.logtype, logfd,
 			"Opening plugin: %s\n", plugin_path);
@@ -473,7 +477,7 @@ int main(int argc, char **argv)
 			"%s", "--- sniffdet session ended ---\n");
 
 	// close log file
-	if (config.global.logfilename[0] != '\0')
+	if (config.global.logfile_path[0] != '\0')
 		close(logfd);
 
 	// free targets string list
@@ -482,6 +486,15 @@ int main(int argc, char **argv)
 	}
 
 	return 0;
+}
+
+/* Copy string to fixed buffer with truncation warning */
+static void copy_path(char *dest, size_t size, const char *src, const char *name)
+{
+	if ((size_t)snprintf(dest, size, "%s", src) >= size) {
+		fprintf(stderr, "Warning: %s truncated (max %zu chars): %s\n",
+				name, size - 1, src);
+	}
 }
 
 /* fill some defaults in the args and global structures */
@@ -493,13 +506,14 @@ static void set_global_defaults(void)
 	config.global.verbose = 0;
 	config.global.silent = 0;
 	config.global.logtype = LOG_NOLOG;
-	config.global.logfilename[0] = '\0';
+	config.global.logfile_path[0] = '\0';
 
 	/* Use XDG search path for plugins directory */
-	snprintf(config.global.plugins_dir, MAX_CFG_VAR_SIZE, "%s", find_plugins_dir());
+	copy_path(config.global.plugins_dir, MAX_PATH_SIZE,
+			find_plugins_dir(), "plugins_dir");
 	snprintf(config.global.plugin, MAX_CFG_VAR_SIZE, "%s", "stdout.so");
 
-	snprintf(config.plugins.xml.filename, MAX_CFG_VAR_SIZE, "%s", "tests_result.xml");
+	snprintf(config.plugins.xml.output_path, MAX_PATH_SIZE, "%s", "tests_result.xml");
 
 	args.target = NULL;
 	args.targetsfile = NULL;
@@ -572,10 +586,10 @@ static void scan_args(int argc, char **argv)
 				break;
 			case 'l':
 				config.global.logtype |= LOG_USE_FILE;
-				snprintf(config.global.logfilename, MAX_CFG_VAR_SIZE, "%s", optarg);
+				snprintf(config.global.logfile_path, MAX_PATH_SIZE, "%s", optarg);
 				break;
 			case 1001:
-				snprintf(config.global.plugins_dir, MAX_CFG_VAR_SIZE, "%s", optarg);
+				snprintf(config.global.plugins_dir, MAX_PATH_SIZE, "%s", optarg);
 				break;
 			case 'p':
 				snprintf(config.global.plugin, MAX_CFG_VAR_SIZE, "%s", optarg);
