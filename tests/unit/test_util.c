@@ -137,6 +137,44 @@ static void test_parse_targets_ip_addresses(void **state)
 }
 
 /*
+ * Test: parse_targets_file() handles tabs and indented comments
+ */
+static void test_parse_targets_whitespace(void **state)
+{
+    (void)state;
+
+    /* Test various whitespace scenarios:
+     * - Tab-only line
+     * - Space-only line
+     * - Indented comment (spaces)
+     * - Indented comment (tab)
+     * - Mixed whitespace line
+     */
+    FILE *f = create_temp_file(
+        "host1\n"
+        "\t\n"                    /* tab-only line */
+        "   \n"                   /* space-only line */
+        "  # indented comment\n"  /* spaces before comment */
+        "\t# tab before comment\n"
+        "host2\n"
+        "   \t  \n"               /* mixed whitespace */
+        "host3\n"
+    );
+    assert_non_null(f);
+
+    char **result = parse_targets_file(f);
+    fclose(f);
+
+    assert_non_null(result);
+    assert_string_equal(result[0], "host1");
+    assert_string_equal(result[1], "host2");
+    assert_string_equal(result[2], "host3");
+    assert_null(result[3]);
+
+    free_stringlist(result);
+}
+
+/*
  * Test: free_stringlist() with empty list
  */
 static void test_free_stringlist_empty(void **state)
@@ -176,6 +214,7 @@ int main(void)
         cmocka_unit_test(test_parse_targets_empty_lines),
         cmocka_unit_test(test_parse_targets_empty_file),
         cmocka_unit_test(test_parse_targets_ip_addresses),
+        cmocka_unit_test(test_parse_targets_whitespace),
         cmocka_unit_test(test_free_stringlist_empty),
         cmocka_unit_test(test_free_stringlist_single),
     };

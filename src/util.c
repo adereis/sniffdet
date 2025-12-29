@@ -43,16 +43,22 @@ char **parse_targets_file(FILE *f_hosts)
 	}
 
 	while (fgets(buffer, sizeof buffer, f_hosts) != NULL) {
+		char *p = buffer;
+
 		if (i >= MAX_HOSTS) {
 			fprintf(stderr,
 					"Warning: Stopped reading hostnames from file after %d entries\n",
 					MAX_HOSTS);
 			break;
 		}
-		// skip comments and white lines
-		if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ') {
+
+		// Skip leading whitespace
+		while (*p == ' ' || *p == '\t')
+			p++;
+
+		// Skip empty lines and comments
+		if (*p == '\0' || *p == '\n' || *p == '#')
 			continue;
-		}
 		hostnames[i] = malloc(strlen(buffer) + 1);
 		if (hostnames[i] == NULL) {
 			// Clean up already-allocated entries
