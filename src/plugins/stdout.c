@@ -96,7 +96,7 @@ static int print_arptest_results(struct test_info info,
 {
 	printf("RESULT: %s\n",
 			info.test.arp.positive ? "POSITIVE" : "NEGATIVE");
-	return info.test.icmp.positive;
+	return info.test.arp.positive;
 }
 
 static int print_dnstest_results(struct test_info info,
@@ -104,7 +104,7 @@ static int print_dnstest_results(struct test_info info,
 {
 	printf("RESULT: %s\n",
 			info.test.dns.positive ? "POSITIVE" : "NEGATIVE");
-	return info.test.icmp.positive;
+	return info.test.dns.positive;
 }
 
 static int print_latencytest_results(struct test_info info,
