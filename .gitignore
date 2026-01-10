@@ -5,6 +5,9 @@
 build/
 cmake-build-*/
 
+# Tool caches
+.cache/
+
 # Autotools artifacts (legacy, can be removed once migration complete)
 Makefile.in
 aclocal.m4
