@@ -4,8 +4,26 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <lib/libsniffdet.h>
-#include "../sniffdet.h" // XXX
+#include "sniffdet.h"
 #include "plugins.h"
+
+/*
+ * Plugin Metadata
+ */
+const char *plugin_name(void)
+{
+	return "Standard Output";
+}
+
+const char *plugin_version(void)
+{
+	return "1.0.0";
+}
+
+int plugin_api_version(void)
+{
+	return SNIFFDET_PLUGIN_API_VERSION;
+}
 
 static int print_icmptest_results(struct test_info info, int verbose);
 static int print_arptest_results(struct test_info info, int verbose);

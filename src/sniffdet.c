@@ -13,6 +13,7 @@
 #include "sniffdet.h"
 #include "log.h"
 #include "util.h"
+#include "plugins/plugins.h"
 
 /*
  * XDG Base Directory support
@@ -342,14 +343,41 @@ int main(int argc, char **argv)
 					"Exiting...");
 			return 1;
 	}
+
+	// Check plugin API version for compatibility
+	int (*get_api_version)(void) = dlsym(o_plugin, "plugin_api_version");
+	if (!get_api_version) {
+		mylog(config.global.logtype | LOG_USE_STDERR, logfd,
+				"Warning: plugin lacks version info (legacy plugin?)");
+	} else if (get_api_version() != SNIFFDET_PLUGIN_API_VERSION) {
+		mylog(config.global.logtype | LOG_USE_STDERR, logfd,
+				"Error: plugin API version mismatch (got %d, expected %d)",
+				get_api_version(), SNIFFDET_PLUGIN_API_VERSION);
+		dlclose(o_plugin);
+		return 1;
+	}
+
+	// Log plugin metadata in verbose mode
+	if (config.global.verbose) {
+		const char *(*get_name)(void) = dlsym(o_plugin, "plugin_name");
+		const char *(*get_version)(void) = dlsym(o_plugin, "plugin_version");
+		if (get_name && get_version) {
+			mylog(config.global.logtype, logfd,
+					"Loaded plugin: %s v%s (API v%d)",
+					get_name(), get_version(),
+					get_api_version ? get_api_version() : 0);
+		}
+	}
+
 	test_output = dlsym(o_plugin, "test_output");
-	if (!o_plugin) {
+	if (!test_output) {
 			mylog(config.global.logtype | LOG_USE_STDERR, logfd,
 					"Invalid plugin - %s", plugin_path);
 			mylog(config.global.logtype | LOG_USE_STDERR, logfd,
 					"%s", dlerror());
 			mylog(config.global.logtype | LOG_USE_STDERR, logfd,
 					"Exiting...");
+			dlclose(o_plugin);
 			return 1;
 	}
 

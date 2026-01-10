@@ -3,8 +3,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <lib/libsniffdet.h>
-#include "../sniffdet.h" // XXX
+#include "sniffdet.h"
 #include "plugins.h"
+
+/*
+ * Plugin Metadata
+ */
+const char *plugin_name(void)
+{
+	return "XML Output";
+}
+
+const char *plugin_version(void)
+{
+	return "1.0.0";
+}
+
+int plugin_api_version(void)
+{
+	return SNIFFDET_PLUGIN_API_VERSION;
+}
 
 static int xml_output(const char *target, const char *file, struct test_info info[],
 		int verbose, char *errbuf);
